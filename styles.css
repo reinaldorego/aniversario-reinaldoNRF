@@ -1,0 +1,1225 @@
+/* ========================================
+   LEVEL XVIII
+   Reinaldo NR Filho
+   ======================================== */
+
+   :root {
+
+    --bg: #070706;
+  
+    --bg-soft: #0d0b07;
+  
+    --gold: #d7aa52;
+  
+    --gold-light: #f4d98b;
+  
+    --gold-dark: #89601e;
+  
+    --text: #f7f3ea;
+  
+    --muted: #b8ad96;
+  
+    --line: rgba(215, 170, 82, 0.34);
+  
+    --danger: #9a493f;
+  
+  }
+  
+  
+  /* ========================================
+     RESET
+     ======================================== */
+  
+  * {
+  
+    box-sizing: border-box;
+  
+  }
+  
+  html {
+  
+    scroll-behavior: smooth;
+  
+    background: var(--bg);
+  
+  }
+  
+  body {
+  
+    margin: 0;
+  
+    min-height: 100vh;
+  
+    font-family:
+      "Montserrat",
+      Arial,
+      sans-serif;
+  
+    color: var(--text);
+  
+    background:
+      radial-gradient(
+        circle at 50% 0%,
+        rgba(215, 170, 82, 0.10),
+        transparent 35%
+      ),
+      var(--bg);
+  
+  }
+  
+  button,
+  input,
+  select {
+  
+    font: inherit;
+  
+  }
+  
+  button {
+  
+    cursor: pointer;
+  
+  }
+  
+  a {
+  
+    color: inherit;
+  
+    text-decoration: none;
+  
+  }
+  
+  .hidden {
+  
+    display: none !important;
+  
+  }
+  
+  
+  /* ========================================
+     INICIALIZAÇÃO
+     ======================================== */
+  
+  .boot {
+  
+    min-height: 100svh;
+  
+    display: flex;
+  
+    justify-content: center;
+  
+    align-items: center;
+  
+    padding: 24px;
+  
+    background:
+      radial-gradient(
+        circle at 50% 45%,
+        rgba(215, 170, 82, 0.10),
+        transparent 40%
+      ),
+      #050504;
+  
+  }
+  
+  .boot-box {
+  
+    position: relative;
+  
+    width: min(
+      520px,
+      100%
+    );
+  
+    padding: 34px 25px;
+  
+    border:
+      1px solid
+      rgba(215, 170, 82, 0.35);
+  
+    background:
+      rgba(12, 10, 7, 0.82);
+  
+  }
+  
+  .boot-box::before,
+  .boot-box::after {
+  
+    content: "";
+  
+    position: absolute;
+  
+    width: 30px;
+  
+    height: 30px;
+  
+    border-color: var(--gold);
+  
+    border-style: solid;
+  
+  }
+  
+  .boot-box::before {
+  
+    top: -1px;
+  
+    left: -1px;
+  
+    border-width:
+      2px 0 0 2px;
+  
+  }
+  
+  .boot-box::after {
+  
+    right: -1px;
+  
+    bottom: -1px;
+  
+    border-width:
+      0 2px 2px 0;
+  
+  }
+  
+  .eyebrow {
+  
+    margin: 0;
+  
+    font-size: 0.73rem;
+  
+    font-weight: 700;
+  
+    letter-spacing: 0.28em;
+  
+    color: var(--gold-light);
+  
+  }
+  
+  .boot h1 {
+  
+    margin:
+      24px 0
+      28px;
+  
+    font-family:
+      "Cinzel",
+      serif;
+  
+    font-size:
+      clamp(
+        2rem,
+        6vw,
+        3rem
+      );
+  
+    line-height: 1.25;
+  
+  }
+  
+  .progress {
+  
+    width: 100%;
+  
+    height: 7px;
+  
+    border:
+      1px solid
+      var(--line);
+  
+    overflow: hidden;
+  
+  }
+  
+  .progress span {
+  
+    display: block;
+  
+    width: 0%;
+  
+    height: 100%;
+  
+    background:
+      linear-gradient(
+        90deg,
+        var(--gold-dark),
+        var(--gold-light)
+      );
+  
+  }
+  
+  .boot-row {
+  
+    display: flex;
+  
+    justify-content:
+      space-between;
+  
+    margin-top: 11px;
+  
+    font-size: 0.72rem;
+  
+    letter-spacing: 0.14em;
+  
+    color: var(--muted);
+  
+  }
+  
+  
+  /* ========================================
+     BOTÕES
+     ======================================== */
+  
+  .btn {
+  
+    width: 100%;
+  
+    min-height: 54px;
+  
+    display: flex;
+  
+    align-items: center;
+  
+    justify-content: center;
+  
+    padding:
+      14px 18px;
+  
+    margin-top: 16px;
+  
+    border:
+      1px solid
+      var(--line);
+  
+    font-weight: 800;
+  
+    font-size: 0.83rem;
+  
+    letter-spacing: 0.08em;
+  
+    transition:
+      transform 0.22s ease,
+      border-color 0.22s ease,
+      background 0.22s ease;
+  
+  }
+  
+  .btn:hover {
+  
+    transform:
+      translateY(-2px);
+  
+  }
+  
+  .btn-gold {
+  
+    border: 0;
+  
+    color: #0b0803;
+  
+    background:
+      linear-gradient(
+        135deg,
+        #a06e22,
+        #f4d98b,
+        #b58131
+      );
+  
+  }
+  
+  .btn-outline {
+  
+    color: var(--gold-light);
+  
+    background:
+      rgba(0, 0, 0, 0.2);
+  
+  }
+  
+  .btn-outline:hover {
+  
+    border-color:
+      var(--gold-light);
+  
+  }
+  
+  .btn-ghost {
+  
+    color: var(--text);
+  
+    background:
+      transparent;
+  
+  }
+  
+  
+  /* ========================================
+     CONTAINER PRINCIPAL
+     ======================================== */
+  
+  .app {
+  
+    width: 100%;
+  
+    max-width: 720px;
+  
+    margin:
+      0 auto;
+  
+    overflow-x: hidden;
+  
+    background: #070706;
+  
+  }
+  
+  
+  /* ========================================
+     HERO / ARTE PRINCIPAL
+     ======================================== */
+  
+  .hero-poster {
+  
+    position: relative;
+  
+    width: 100%;
+  
+    min-height: auto;
+  
+    height: auto;
+  
+    display: flex;
+  
+    justify-content: center;
+  
+    align-items: flex-start;
+  
+    background: #050504;
+  
+    overflow: visible;
+  
+  }
+  
+  .poster-image {
+  
+    display: block;
+  
+    width: 100%;
+  
+    height: auto;
+  
+    max-width: 720px;
+  
+    object-fit: contain;
+  
+    object-position:
+      center top;
+  
+  }
+  
+  .poster-next {
+  
+    position: absolute;
+  
+    left: 50%;
+  
+    bottom: 22px;
+  
+    transform:
+      translateX(-50%);
+  
+    width: 50px;
+  
+    height: 50px;
+  
+    display: flex;
+  
+    justify-content: center;
+  
+    align-items: center;
+  
+    border:
+      1px solid
+      rgba(244, 217, 139, 0.7);
+  
+    border-radius: 50%;
+  
+    background:
+      rgba(0, 0, 0, 0.78);
+  
+    color: var(--gold-light);
+  
+    font-size: 1.45rem;
+  
+    backdrop-filter:
+      blur(8px);
+  
+    animation:
+      arrowPulse
+      1.8s
+      infinite;
+  
+  }
+  
+  @keyframes arrowPulse {
+  
+    0%,
+    100% {
+  
+      transform:
+        translateX(-50%)
+        translateY(0);
+  
+    }
+  
+    50% {
+  
+      transform:
+        translateX(-50%)
+        translateY(5px);
+  
+    }
+  
+  }
+  
+  
+  /* ========================================
+     SEÇÕES
+     ======================================== */
+  
+  .section {
+  
+    position: relative;
+  
+    padding:
+      78px 24px;
+  
+    border-top:
+      1px solid
+      rgba(215, 170, 82, 0.13);
+  
+  }
+  
+  .section-kicker {
+  
+    margin: 0;
+  
+    font-size: 0.72rem;
+  
+    font-weight: 700;
+  
+    letter-spacing: 0.30em;
+  
+    color: var(--gold-light);
+  
+  }
+  
+  .section h2 {
+  
+    margin:
+      19px 0
+      22px;
+  
+    font-family:
+      "Cinzel",
+      serif;
+  
+    font-size:
+      clamp(
+        2rem,
+        8vw,
+        4rem
+      );
+  
+    line-height: 1.04;
+  
+  }
+  
+  .section p {
+  
+    max-width: 600px;
+  
+    font-size: 1rem;
+  
+    line-height: 1.8;
+  
+    color: #dad3c5;
+  
+  }
+  
+  
+  /* ========================================
+     HISTÓRIA
+     ======================================== */
+  
+  .story {
+  
+    background:
+      radial-gradient(
+        circle at 100% 20%,
+        rgba(215, 170, 82, 0.08),
+        transparent 40%
+      );
+  
+  }
+  
+  .story blockquote {
+  
+    margin:
+      32px 0 0;
+  
+    padding:
+      5px 0
+      5px 19px;
+  
+    border-left:
+      2px solid
+      var(--gold);
+  
+    font-family:
+      "Cinzel",
+      serif;
+  
+    font-size: 1rem;
+  
+    line-height: 1.8;
+  
+    color:
+      var(--gold-light);
+  
+  }
+  
+  
+  /* ========================================
+     EVENTO
+     ======================================== */
+  
+  .grid {
+  
+    display: grid;
+  
+    grid-template-columns:
+      repeat(2, 1fr);
+  
+    gap: 12px;
+  
+    margin:
+      30px 0;
+  
+  }
+  
+  .card {
+  
+    min-height: 145px;
+  
+    padding:
+      20px 17px;
+  
+    border:
+      1px solid
+      var(--line);
+  
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.025),
+        rgba(215, 170, 82, 0.035)
+      );
+  
+  }
+  
+  .card span {
+  
+    display: block;
+  
+    font-size: 0.63rem;
+  
+    font-weight: 700;
+  
+    letter-spacing: 0.17em;
+  
+    color:
+      var(--gold-light);
+  
+  }
+  
+  .card strong {
+  
+    display: block;
+  
+    margin:
+      13px 0 8px;
+  
+    font-size: 1.35rem;
+  
+    line-height: 1.25;
+  
+  }
+  
+  .card small {
+  
+    display: block;
+  
+    font-size: 0.76rem;
+  
+    line-height: 1.5;
+  
+    color:
+      var(--muted);
+  
+  }
+  
+  
+  /* ========================================
+     MISSÃO
+     ======================================== */
+  
+  .mission {
+  
+    text-align: center;
+  
+    background:
+      radial-gradient(
+        circle at center,
+        rgba(215, 170, 82, 0.11),
+        transparent 55%
+      );
+  
+  }
+  
+  .mission .section-kicker {
+  
+    text-align: center;
+  
+  }
+  
+  .mission p {
+  
+    margin-left: auto;
+  
+    margin-right: auto;
+  
+  }
+  
+  .deadline {
+  
+    padding-top: 4px;
+  
+  }
+  
+  .deadline strong {
+  
+    color:
+      var(--gold-light);
+  
+  }
+  
+  
+  /* ========================================
+     CONTAGEM REGRESSIVA
+     ======================================== */
+  
+  .countdown {
+  
+    text-align: center;
+  
+  }
+  
+  .count-grid {
+  
+    display: grid;
+  
+    grid-template-columns:
+      repeat(4, 1fr);
+  
+    gap: 8px;
+  
+    margin-top: 30px;
+  
+  }
+  
+  .count-grid div {
+  
+    padding:
+      23px 5px;
+  
+    border:
+      1px solid
+      var(--line);
+  
+    background:
+      rgba(255, 255, 255, 0.015);
+  
+  }
+  
+  .count-grid strong {
+  
+    display: block;
+  
+    font-family:
+      "Cinzel",
+      serif;
+  
+    font-size:
+      clamp(
+        1.7rem,
+        7vw,
+        3rem
+      );
+  
+    color:
+      var(--gold-light);
+  
+  }
+  
+  .count-grid span {
+  
+    display: block;
+  
+    margin-top: 6px;
+  
+    font-size: 0.58rem;
+  
+    letter-spacing: 0.08em;
+  
+    color:
+      var(--muted);
+  
+  }
+  
+  
+  /* ========================================
+     ENCERRAMENTO
+     ======================================== */
+  
+  .closing {
+  
+    padding-bottom: 120px;
+  
+    text-align: center;
+  
+    background:
+      radial-gradient(
+        circle at 50% 100%,
+        rgba(215, 170, 82, 0.11),
+        transparent 45%
+      );
+  
+  }
+  
+  .monogram {
+  
+    margin-bottom: 20px;
+  
+    font-family:
+      "Cinzel",
+      serif;
+  
+    font-size: 4rem;
+  
+    font-style: italic;
+  
+    color:
+      var(--gold-light);
+  
+  }
+  
+  .closing p {
+  
+    margin:
+      0 auto;
+  
+    font-size: 0.82rem;
+  
+    letter-spacing: 0.25em;
+  
+    color:
+      var(--gold-light);
+  
+  }
+  
+  .closing span {
+  
+    display: block;
+  
+    margin-top: 8px;
+  
+    font-size: 0.64rem;
+  
+    letter-spacing: 0.30em;
+  
+    color:
+      var(--muted);
+  
+  }
+  
+  
+  /* ========================================
+     MODAIS
+     ======================================== */
+  
+  .dialog {
+  
+    width:
+      min(
+        92vw,
+        520px
+      );
+  
+    max-height: 90vh;
+  
+    padding: 0;
+  
+    border:
+      1px solid
+      var(--line);
+  
+    color:
+      var(--text);
+  
+    background:
+      #0a0907;
+  
+    box-shadow:
+      0 25px 90px
+      rgba(0, 0, 0, 0.9);
+  
+  }
+  
+  .dialog::backdrop {
+  
+    background:
+      rgba(0, 0, 0, 0.86);
+  
+    backdrop-filter:
+      blur(6px);
+  
+  }
+  
+  .dialog form,
+  .pass {
+  
+    position: relative;
+  
+    padding:
+      31px 28px;
+  
+  }
+  
+  .dialog h3 {
+  
+    margin:
+      17px 0
+      27px;
+  
+    font-family:
+      "Cinzel",
+      serif;
+  
+    font-size: 1.8rem;
+  
+  }
+  
+  .dialog label {
+  
+    display: block;
+  
+    margin:
+      17px 0;
+  
+    font-size: 0.78rem;
+  
+    letter-spacing: 0.07em;
+  
+    color:
+      var(--muted);
+  
+  }
+  
+  .dialog input,
+  .dialog select {
+  
+    width: 100%;
+  
+    margin-top: 9px;
+  
+    padding:
+      15px;
+  
+    border:
+      1px solid
+      var(--line);
+  
+    outline: none;
+  
+    color: #ffffff;
+  
+    background:
+      #11100d;
+  
+  }
+  
+  .dialog input:focus,
+  .dialog select:focus {
+  
+    border-color:
+      var(--gold-light);
+  
+  }
+  
+  .dialog-close {
+  
+    position: absolute;
+  
+    top: 8px;
+  
+    right: 14px;
+  
+    border: none;
+  
+    color: white;
+  
+    background: transparent;
+  
+    font-size: 2rem;
+  
+  }
+  
+  .prototype-note {
+  
+    margin-top: 18px !important;
+  
+    font-size: 0.7rem !important;
+  
+    line-height: 1.55 !important;
+  
+    color:
+      #8d8577 !important;
+  
+  }
+  
+  
+  /* ========================================
+     ACCESS PASS
+     ======================================== */
+  
+  .pass {
+  
+    text-align: center;
+  
+  }
+  
+  .pass-title {
+  
+    margin-top: 18px;
+  
+    font-family:
+      "Cinzel",
+      serif;
+  
+    font-size: 2.2rem;
+  
+    color:
+      var(--gold-light);
+  
+  }
+  
+  .pass-subtitle {
+  
+    margin:
+      7px 0
+      28px;
+  
+    font-size: 0.7rem;
+  
+    letter-spacing: 0.27em;
+  
+    color:
+      var(--muted);
+  
+  }
+  
+  .pass-line {
+  
+    display: flex;
+  
+    justify-content:
+      space-between;
+  
+    gap: 20px;
+  
+    padding:
+      15px 0;
+  
+    border-top:
+      1px solid
+      var(--line);
+  
+    text-align: left;
+  
+  }
+  
+  .pass-line span {
+  
+    font-size: 0.60rem;
+  
+    letter-spacing: 0.14em;
+  
+    color:
+      var(--muted);
+  
+  }
+  
+  .pass-line strong {
+  
+    max-width: 60%;
+  
+    text-align: right;
+  
+  }
+  
+  .confirmed {
+  
+    color:
+      var(--gold-light);
+  
+  }
+  
+  
+  /* QR demonstrativo */
+  
+  .fake-qr {
+  
+    width: 150px;
+  
+    aspect-ratio: 1;
+  
+    margin:
+      28px auto
+      14px;
+  
+    border:
+      10px solid
+      #ffffff;
+  
+    background:
+  
+      conic-gradient(
+        from 90deg,
+  
+        #ffffff 0 25%,
+  
+        #111111 0 50%,
+  
+        #ffffff 0 75%,
+  
+        #111111 0
+      )
+  
+      0 0 / 24px 24px;
+  
+    box-shadow:
+      0 0 0 1px
+      #222;
+  
+  }
+  
+  .pass small {
+  
+    display: block;
+  
+    margin-bottom: 10px;
+  
+    font-size: 0.64rem;
+  
+    letter-spacing: 0.14em;
+  
+    color:
+      var(--muted);
+  
+  }
+  
+  
+  /* ========================================
+     MOBILE
+     ======================================== */
+  
+  @media
+  (max-width: 720px) {
+  
+    .poster-image {
+  
+      width: 100%;
+  
+      max-width: none;
+  
+    }
+  
+    .poster-next {
+  
+      bottom: 15px;
+  
+    }
+  
+  }
+  
+  
+  @media
+  (max-width: 480px) {
+  
+    .section {
+  
+      padding:
+        64px 18px;
+  
+    }
+  
+    .grid {
+  
+      grid-template-columns:
+        1fr;
+  
+    }
+  
+    .card {
+  
+      min-height: auto;
+  
+    }
+  
+    .count-grid {
+  
+      gap: 5px;
+  
+    }
+  
+    .count-grid div {
+  
+      padding:
+        20px 3px;
+  
+    }
+  
+    .count-grid strong {
+  
+      font-size: 1.7rem;
+  
+    }
+  
+    .count-grid span {
+  
+      font-size: 0.52rem;
+  
+    }
+  
+  }
+  
+  
+  @media
+  (max-width: 340px) {
+  
+    .count-grid strong {
+  
+      font-size: 1.4rem;
+  
+    }
+  
+  }
