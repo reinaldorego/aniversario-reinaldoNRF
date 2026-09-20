@@ -4,7 +4,7 @@
    ======================================== */
 
    const CACHE_NAME =
-   "level-xviii-v3";
+   "level-xviii-v4";
  
  
  const FILES_TO_CACHE =

@@ -134,6 +134,12 @@
       >
 
       <a
+        href="#mission"
+        class="poster-rsvp-hit"
+        aria-label="Ir para confirmação de presença"
+      ></a>
+
+      <a
         href="#story"
         class="poster-next"
         aria-label="Continuar convite"
@@ -173,6 +179,15 @@
         “Grandes conquistas começam com
         pessoas incríveis ao nosso lado.”
       </blockquote>
+
+      <a
+        class="section-next"
+        href="#event"
+        aria-label="Continuar para 02 The Event"
+      >
+        <span>02 // THE EVENT</span>
+        <strong>↓</strong>
+      </a>
 
     </section>
 
@@ -277,6 +292,15 @@
         📍 ABRIR LOCALIZAÇÃO
       </a>
 
+      <a
+        class="section-next"
+        href="#mission"
+        aria-label="Continuar para 03 The Mission"
+      >
+        <span>03 // THE MISSION</span>
+        <strong>↓</strong>
+      </a>
+
     </section>
 
 
@@ -326,6 +350,15 @@
         AINDA NÃO SEI
       </button>
 
+      <a
+        class="section-next"
+        href="#countdown"
+        aria-label="Continuar para 04 Countdown"
+      >
+        <span>04 // COUNTDOWN</span>
+        <strong>↓</strong>
+      </a>
+
     </section>
 
 
@@ -334,6 +367,7 @@
          ===================================== -->
 
     <section
+      id="countdown"
       class="section countdown"
     >
 
@@ -400,6 +434,32 @@
 
       </div>
 
+      <div
+        id="confirmationStatus"
+        class="confirmation-status hidden"
+        aria-live="polite"
+      >
+        <span>MISSÃO CONCLUÍDA</span>
+        <strong>Presença confirmada!</strong>
+        <p>Seu Access Pass individual está disponível.</p>
+        <a
+          id="viewPassBtn"
+          class="btn btn-outline"
+          href="#"
+        >
+          ABRIR MEU ACCESS PASS
+        </a>
+      </div>
+
+      <a
+        class="section-next"
+        href="#closing"
+        aria-label="Continuar para o encerramento"
+      >
+        <span>NOS VEMOS LÁ</span>
+        <strong>↓</strong>
+      </a>
+
     </section>
 
 
@@ -407,7 +467,10 @@
          ENCERRAMENTO
          ===================================== -->
 
-    <section class="section closing">
+    <section
+      id="closing"
+      class="section closing"
+    >
 
       <div class="monogram">
         NR
@@ -428,213 +491,6 @@
     </section>
 
   </main>
-
-
-  <!-- =====================================
-       MODAL RSVP
-       ===================================== -->
-
-  <dialog
-    id="rsvpDialog"
-    class="dialog"
-  >
-
-    <form
-      id="rsvpForm"
-    >
-
-      <button
-        type="button"
-        id="closeRsvp"
-        class="dialog-close"
-        aria-label="Fechar"
-      >
-        ×
-      </button>
-
-      <p class="section-kicker">
-        ACCESS REQUEST
-      </p>
-
-      <h3>
-        CONFIRMAR PRESENÇA
-      </h3>
-
-
-      <label for="guestName">
-
-        Nome do convidado
-
-        <input
-          id="guestName"
-          type="text"
-          maxlength="80"
-          autocomplete="name"
-          placeholder="Digite seu nome"
-          required
-        >
-
-      </label>
-
-
-      <label for="companions">
-
-        Acompanhantes
-
-        <select id="companions">
-
-          <option value="0">
-            Nenhum
-          </option>
-
-          <option value="1">
-            1 pessoa
-          </option>
-
-          <option value="2">
-            2 pessoas
-          </option>
-
-          <option value="3">
-            3 pessoas
-          </option>
-
-        </select>
-
-      </label>
-
-
-      <button
-        id="confirmBtn"
-        class="btn btn-gold"
-        type="submit"
-      >
-        GERAR ACCESS PASS
-      </button>
-
-
-      <p class="prototype-note">
-        Nesta primeira versão,
-        a confirmação é salva apenas neste aparelho.
-      </p>
-
-    </form>
-
-  </dialog>
-
-
-  <!-- =====================================
-       ACCESS PASS
-       ===================================== -->
-
-  <dialog
-    id="passDialog"
-    class="dialog pass-dialog"
-  >
-
-    <div class="pass">
-
-      <p class="section-kicker">
-        ACCESS GRANTED
-      </p>
-
-      <div class="pass-title">
-        LEVEL XVIII
-      </div>
-
-      <div class="pass-subtitle">
-        ACCESS PASS
-      </div>
-
-
-      <div class="pass-line">
-
-        <span>
-          CONVIDADO
-        </span>
-
-        <strong id="passName">
-          —
-        </strong>
-
-      </div>
-
-
-      <div class="pass-line">
-
-        <span>
-          DATA
-        </span>
-
-        <strong>
-          15 NOV 2026
-        </strong>
-
-      </div>
-
-
-      <div class="pass-line">
-
-        <span>
-          HORÁRIO
-        </span>
-
-        <strong>
-          20:00
-        </strong>
-
-      </div>
-
-
-      <div class="pass-line">
-
-        <span>
-          ACOMPANHANTES
-        </span>
-
-        <strong id="passCompanions">
-          0
-        </strong>
-
-      </div>
-
-
-      <div class="pass-line">
-
-        <span>
-          STATUS
-        </span>
-
-        <strong class="confirmed">
-          CONFIRMADO ✓
-        </strong>
-
-      </div>
-
-
-      <div
-        id="fakeQr"
-        class="fake-qr"
-        aria-label="QR demonstrativo"
-      ></div>
-
-
-      <small id="passId">
-        ID: LVL18-DEMO
-      </small>
-
-
-      <button
-        id="closePass"
-        class="btn btn-outline"
-        type="button"
-      >
-        FECHAR
-      </button>
-
-    </div>
-
-  </dialog>
 
 
   <script src="app.js"></script>
