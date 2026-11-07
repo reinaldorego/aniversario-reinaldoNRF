@@ -1,4 +1,4 @@
-# LIVE EXPERIENCE — piloto local 04B.1
+# LIVE EXPERIENCE — piloto local 04B.1 e adaptador simulado 04B.2
 
 Prova de sincronização **inteiramente local e sintética**, isolada do convite. Não conecta Google Drive, Apps Script, Sheets, internet, frontend ou convidados. Não é backend de produção nem autenticação de publicadores/leitores. A numeração 04B.1 desta entrega segue o pedido atual: corresponde à prova local prevista como 04B.0 no plano 04A.2, sem executar a etapa de conexão real ali chamada 04B.1.
 
@@ -138,7 +138,7 @@ O código do álbum e OIDC dos publicadores **não estão implementados**: não 
 
 ## Limites e migração futura
 
-1. Trocar LocalSource por adaptador Drive com paginação/completude, version/checksum/parents e rechecagem individual, preservando invariantes. Implementar ACL direta/herdada real, duas identidades comprovadas, OAuth isolado, bootstrap/reconciliação e política de certificação.
+1. O Marco 04B.2 acrescenta fonte Drive com cliente em memória, paginação, ACL simulada, checkpoint e revalidação por interface. LocalSource continua padrão. Antes de conexão real, implementar/comprovar ACL direta/herdada real, duas identidades, OAuth isolado, bootstrap/reconciliação e certificação.
 2. Escolher provedor/banco/fila/cofre e locks/transações distribuídos. Lock de PID é somente local; se recuperação interromper com recovery.lock ou lock inválido, parar e revisar manualmente, sem forçar reset. PID reutilizado pode bloquear recuperação até revisão.
 3. Implementar código de álbum e OIDC/allowlist verdadeiros, antes de conteúdo real. Exigir política de mídia/retirada/TTL, logs e orçamento aprovados.
 4. Substituir codec de teste por biblioteca/worker de imagens mantidos e isolados, com formatos e limites homologados; justificar dependências e medir qualidade/CPU. Não levar este parser de perfil restrito diretamente para produção.
@@ -150,3 +150,7 @@ O código do álbum e OIDC dos publicadores **não estão implementados**: não 
 Aprovação deste piloto não escolhe provedor, acessa Drive, cria serviços, autentica identidades reais ou autoriza publicação. Convite, galeria, RSVP, Access Pass/QR/check-in, SW, manifest e Documento Mestre preservados.
 
 Referências de implementação: [PNG/W3C](https://www.w3.org/TR/png-3/), [Node zlib](https://nodejs.org/docs/latest-v24.x/api/zlib.html), [Node test runner](https://nodejs.org/docs/latest-v24.x/api/test.html). [Resultado da validação](VALIDACAO_MARCO_04B_1.md).
+
+## Marco 04B.2 — Drive API simulado
+
+[Contrato, campos utilizados e limites do mock](DRIVE_MOCK.md) e [resultados D01–D19](VALIDACAO_MARCO_04B_2.md). A suíte completa tem 101 testes/subtestes, incluindo os 33 anteriores, todos aprovados. `npm.cmd run check` e `npm.cmd test` continuam sendo os comandos de validação. Nenhuma dependência foi adicionada. Não existe configuração que conecte a CLI padrão ao Google Drive real.

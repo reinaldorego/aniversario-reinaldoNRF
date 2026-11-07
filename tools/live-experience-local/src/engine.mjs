@@ -6,7 +6,7 @@ import { LocalSource } from './local-source.mjs';
 import { decodePng, processSyntheticPng, sha256 } from './png.mjs';
 
 export class Simulator {
-  static async open({ root, stableMs = 1000, freshMs = 15000, clock = Date.now, processor = processSyntheticPng } = {}) {
+  static async open({ root, stableMs = 1000, freshMs = 15000, clock = Date.now, processor = processSyntheticPng, source = null } = {}) {
     if (!Number.isFinite(stableMs) || stableMs < 1 || !Number.isFinite(freshMs) || freshMs < stableMs) throw new Error('INVALID_TIMING');
     const store = new StateStore(root);
     const state = await store.open(kind => ({
@@ -14,9 +14,18 @@ export class Simulator {
       securityEpoch: 1, controlVersion: 1, revision: 0, everPublished: false,
       sources: [], jobs: [], hashClaims: [], changes: [], audit: [], processed: 0, lastCompleteScanAt: null
     }));
-    const engine = new Simulator(store, state, { stableMs, freshMs, clock, processor });
+    const engine = new Simulator(store, state, { stableMs, freshMs, clock, processor, source });
     try {
-      await engine.source.init();
+      if (state.sourceIdentity && state.sourceIdentity !== source?.identity) throw new Error('SOURCE_IDENTITY_MISMATCH');
+      if (source && !state.sourceIdentity && state.sources.length) throw new Error('SOURCE_REQUIRES_SEPARATE_STATE');
+      if (source) {
+        if (typeof source.identity !== 'string' || !source.identity) throw new Error('SOURCE_IDENTITY_REQUIRED');
+        state.sourceIdentity = source.identity;
+      }
+      await engine.source.init(state.sourceCheckpoint ?? null);
+      const derivatives = path.join(store.root, 'derivatives');
+      await fs.mkdir(derivatives, { recursive: true });
+      if ((await fs.lstat(derivatives)).isSymbolicLink()) throw new Error('SYMLINK_DIRECTORY');
       state.lastCompleteScanAt = null; // Restart always requires a fresh complete reconciliation.
       for (const job of state.jobs) if (job.status === 'RUNNING') {
         job.status = 'QUEUED';
@@ -29,7 +38,7 @@ export class Simulator {
   }
   constructor(store, state, options) {
     Object.assign(this, options);
-    this.store = store; this.state = state; this.source = new LocalSource(store.root);
+    this.store = store; this.state = state; this.source = options.source ?? new LocalSource(store.root);
     this.tail = Promise.resolve(); this.draining = false; this.fatal = false;
   }
   mutate(action) {
@@ -66,17 +75,23 @@ export class Simulator {
     this.transition(entry, 'WITHDRAWN', reason);
   }
   async setPermissions(status) {
+    if (this.source.authorize) throw new Error('SOURCE_CONTROLS_PERMISSIONS');
     if (!['allowed', 'denied', 'indeterminate'].includes(status)) throw new Error('INVALID_PERMISSION_SCENARIO');
-    return this.mutate(() => {
-      if (this.state.permissions !== status) {
-        this.state.permissions = status; this.state.securityEpoch++;
-        this.state.lastCompleteScanAt = null;
-        if (status !== 'allowed') { this.state.paused = true; this.state.controlVersion++; }
-        for (const job of this.state.jobs) if (['RUNNING', 'QUEUED'].includes(job.status)) job.status = 'STALE';
-        for (const entry of this.state.sources) if (entry.state === 'PROCESSING') this.transition(entry, 'RECEIVED', 'PERMISSION_EPOCH_CHANGED');
-        this.audit('SIMULATED_PERMISSIONS', { status });
-      }
-    });
+    return this.mutate(() => this.applyPermissions(status));
+  }
+  applyPermissions(status) {
+    if (this.state.permissions !== status) {
+      this.state.permissions = status; this.state.securityEpoch++;
+      this.state.lastCompleteScanAt = null;
+      if (status !== 'allowed') { this.state.paused = true; this.state.controlVersion++; }
+      for (const job of this.state.jobs) if (['RUNNING', 'QUEUED'].includes(job.status)) job.status = 'STALE';
+      for (const entry of this.state.sources) if (entry.state === 'PROCESSING') this.transition(entry, 'RECEIVED', 'PERMISSION_EPOCH_CHANGED');
+      this.audit('SIMULATED_PERMISSIONS', { status });
+    }
+  }
+  sourceFailure() {
+    const status = this.source.authorization?.status;
+    if (status === 'denied' || status === 'indeterminate') this.applyPermissions(status);
   }
   async pause(paused) {
     return this.mutate(() => {
@@ -99,8 +114,16 @@ export class Simulator {
   async scan() {
     return this.mutate(async () => {
       let snapshot;
-      try { snapshot = await this.source.list(this.state.listingMode); }
+      try {
+        if (this.source.authorize) {
+          const authorization = await this.source.authorize();
+          this.applyPermissions(authorization.status);
+          if (authorization.status !== 'allowed') throw new Error('SOURCE_AUTHORIZATION_BLOCKED');
+        }
+        snapshot = await this.source.list(this.state.listingMode, this.state.sourceCheckpoint);
+      }
       catch {
+        this.sourceFailure();
         this.state.lastScanError = 'LIST_READ_FAILED';
         this.audit('SCAN_FAILED');
         return { complete: false };
@@ -115,7 +138,7 @@ export class Simulator {
         // A full scan plus individual absence prevents partial inventory mass removal.
         try { await this.source.read(entry.name); this.state.lastScanError = 'LIST_CHANGED'; return { complete: false }; }
         catch (error) {
-          if (error.code !== 'ENOENT') { this.state.lastScanError = 'ABSENCE_UNCERTAIN'; return { complete: false }; }
+          if (error.code !== 'ENOENT') { this.sourceFailure(); this.state.lastScanError = 'ABSENCE_UNCERTAIN'; return { complete: false }; }
         }
       }
       for (const entry of this.state.sources) if (entry.present && !seen.has(entry.name)) this.withdraw(entry, 'LEFT_EDITORIAL_FOLDER');
@@ -166,13 +189,14 @@ export class Simulator {
         if (!canonical?.present || canonical.hash !== claim.hash || canonical.state === 'WITHDRAWN') claim.retired = true;
       }
       this.state.lastCompleteScanAt = this.clock();
+      if (snapshot.checkpoint) this.state.sourceCheckpoint = snapshot.checkpoint;
       this.state.lastScanError = null;
       this.audit('SCAN_COMPLETE', { count: snapshot.entries.length });
       return { complete: true };
     });
   }
   isFresh() {
-    return !this.fatal && this.state.permissions === 'allowed' && this.state.lastCompleteScanAt !== null &&
+    return !this.fatal && this.source.readAllowed !== false && this.state.permissions === 'allowed' && this.state.lastCompleteScanAt !== null &&
       this.clock() - this.state.lastCompleteScanAt <= this.freshMs;
   }
   async claim() {
@@ -223,6 +247,7 @@ export class Simulator {
       let current;
       try { current = await this.source.read(entry.name); }
       catch (error) {
+        this.sourceFailure();
         if (error.code === 'ENOENT') this.withdraw(entry, 'ABSENT_BEFORE_COMMIT');
         stored.status = 'STALE'; return 'STALE';
       }
@@ -235,6 +260,14 @@ export class Simulator {
         if (sha256(bytes) !== record.sha256 || decodePng(bytes).chunks.join(',') !== 'IHDR,IDAT,IEND') throw new Error('DERIVATIVE_INTEGRITY');
       }
       entry.derivatives = derivatives;
+      if (this.source.revalidate) {
+        try { await this.source.revalidate(entry.name, job.fingerprint); }
+        catch {
+          this.sourceFailure(); stored.status = 'STALE';
+          if (entry.state === 'PROCESSING') this.transition(entry, 'RECEIVED', 'SOURCE_REVALIDATION_FAILED');
+          return 'STALE';
+        }
+      }
       this.transition(entry, 'READY');
       stored.status = 'DONE';
       if (this.state.paused || !this.isFresh() || this.state.listingMode !== 'complete' || this.state.lastScanError ||
@@ -268,6 +301,7 @@ export class Simulator {
           await this.completeJob(job, derivatives);
         } catch {
           await this.mutate(() => {
+            this.sourceFailure();
             const stored = this.state.jobs.find(item => item.id === job.id);
             const entry = this.state.sources.find(item => item.id === job.sourceId);
             if (stored?.status === 'RUNNING' && entry?.present && entry.generation === job.generation) {
