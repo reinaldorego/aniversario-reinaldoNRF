@@ -1,6 +1,6 @@
 /* LEVEL XVIII — cache dos arquivos públicos do convite e da página provisória. */
 
-const CACHE_NAME = "level-xviii-v5";
+const CACHE_NAME = "level-xviii-v6";
 const INVITATION_CACHE_PATTERN = /^level-xviii-v\d+$/;
 
 const FILES_TO_CACHE = [
@@ -9,9 +9,10 @@ const FILES_TO_CACHE = [
   "./styles.css",
   "./app.js",
   "./manifest.webmanifest",
-  "./assets/hero.png",
-  "./assets/icon-192.png",
-  "./assets/icon-512.png",
+  "./assets/reinaldo-oficial.jpeg",
+  "./assets/icon-level-xviii.svg",
+  "./assets/icon-level-xviii-192.png",
+  "./assets/icon-level-xviii-512.png",
   "./live-experience/",
   "./live-experience/index.html",
   "./live-experience/styles.css",
