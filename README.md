@@ -3,7 +3,7 @@
 ## Dados
 - Reinaldo NR Filho
 - 18 anos
-- 15/11/2026 às 20:00
+- 28/11/2026 (sábado), às 21h (Belém/PA)
 - Ed. Dhahram
 - Trav. Vileta, 1197
 - Até 3 acompanhantes

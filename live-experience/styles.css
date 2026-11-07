@@ -1,0 +1,128 @@
+.live-page {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+}
+
+.live-shell {
+  width: min(100%, 600px);
+  min-width: 0;
+  padding: clamp(28px, 6vw, 56px);
+  border: 1px solid var(--line);
+  background: linear-gradient(155deg, rgba(215, 170, 82, 0.08), transparent 45%), var(--bg-soft);
+  text-align: center;
+}
+
+.live-brand,
+.live-kicker,
+.live-signature {
+  color: var(--gold-light);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1.8;
+}
+
+.live-brand {
+  margin: 0;
+}
+
+.live-brand span {
+  padding: 0 6px;
+  color: var(--muted);
+}
+
+.live-monogram {
+  display: grid;
+  place-items: center;
+  width: 100px;
+  height: 100px;
+  margin: 36px auto 28px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  color: var(--gold-light);
+  font-family: "Cinzel", Georgia, serif;
+  font-size: 3rem;
+}
+
+.live-shell h1 {
+  margin: 16px 0;
+  font-family: "Cinzel", Georgia, serif;
+  font-size: clamp(2.25rem, 10vw, 4rem);
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.live-intro,
+.live-notice p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.live-notice {
+  margin: 32px 0;
+  padding: 24px 18px;
+  border-block: 1px solid var(--line);
+}
+
+.live-status {
+  display: inline-block;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  color: var(--gold-light);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.live-notice h2 {
+  margin: 20px 0 10px;
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+
+.live-notice p {
+  margin: 0;
+}
+
+.live-event {
+  font-size: 0.8rem;
+  line-height: 1.8;
+}
+
+.live-event span {
+  display: block;
+  color: var(--muted);
+}
+
+.live-page .btn {
+  white-space: normal;
+  line-height: 1.5;
+}
+
+.live-page .btn:focus-visible {
+  outline: 3px solid var(--gold-light);
+  outline-offset: 4px;
+}
+
+.live-signature {
+  margin: 28px 0 0;
+  color: var(--muted);
+  font-size: 0.6rem;
+}
+
+@media (max-width: 360px) {
+  .live-page {
+    padding: 16px 12px;
+  }
+
+  .live-shell {
+    padding: 28px 18px;
+  }
+
+  .live-notice {
+    padding-inline: 0;
+  }
+}

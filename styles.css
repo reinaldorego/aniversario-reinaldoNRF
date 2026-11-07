@@ -721,6 +721,28 @@
   
   }
   
+  .card-link {
+    display: block;
+    min-width: 0;
+    transition: border-color 0.22s ease, background-color 0.22s ease;
+  }
+
+  .card-link:hover {
+    border-color: var(--gold-light);
+    background-color: rgba(215, 170, 82, 0.08);
+  }
+
+  .card-link:focus-visible {
+    outline: 3px solid var(--gold-light);
+    outline-offset: 4px;
+  }
+
+  .card-link .card-status {
+    margin-top: 14px;
+    color: var(--gold-light);
+    font-weight: 700;
+  }
+
   .card span {
   
     display: block;
@@ -1423,4 +1445,21 @@
   
     }
   
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    .btn:hover {
+      transform: none;
+    }
   }
