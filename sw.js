@@ -1,6 +1,6 @@
-/* LEVEL XVIII — cache dos arquivos públicos do convite e da página provisória. */
+/* LEVEL XVIII — cache dos arquivos públicos do convite e da galeria. */
 
-const CACHE_NAME = "level-xviii-v6";
+const CACHE_NAME = "level-xviii-v7";
 const INVITATION_CACHE_PATTERN = /^level-xviii-v\d+$/;
 
 const FILES_TO_CACHE = [
@@ -16,7 +16,10 @@ const FILES_TO_CACHE = [
   "./live-experience/",
   "./live-experience/index.html",
   "./live-experience/styles.css",
-  "./live-experience/app.js"
+  "./live-experience/app.js",
+  "./live-experience/navigation.js",
+  "./live-experience/data-source.js",
+  "./live-experience/gallery.js"
 ];
 
 const STATIC_PATHS = new Set(

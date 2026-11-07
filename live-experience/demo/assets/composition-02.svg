@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000">
+  <title>Ilustração de demonstração: luzes geométricas</title>
+  <rect width="800" height="1000" fill="#0a0c0d"/>
+  <g fill="none" stroke="#89601e" stroke-width="2">
+    <path d="M60 60h680v880H60zM150 100v800M650 100v800M100 400h600M100 600h600"/>
+    <path d="M400 220l200 280-200 280-200-280z" stroke="#d7aa52"/>
+  </g>
+  <text x="400" y="155" text-anchor="middle" fill="#d7aa52" font-family="Arial,sans-serif" font-size="22" letter-spacing="6">DEMONSTRAÇÃO</text>
+  <text x="400" y="550" text-anchor="middle" fill="#f4d98b" font-family="Georgia,serif" font-size="130">XVIII</text>
+  <text x="400" y="870" text-anchor="middle" fill="#b8ad96" font-family="Arial,sans-serif" font-size="22" letter-spacing="3">ILUSTRAÇÃO DE TESTE</text>
+</svg>

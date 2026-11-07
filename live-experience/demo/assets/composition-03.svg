@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+  <title>Ilustração de demonstração: órbitas douradas</title>
+  <rect width="800" height="800" fill="#1b150d"/>
+  <g fill="none" stroke="#89601e" stroke-width="2">
+    <circle cx="400" cy="400" r="280"/><circle cx="400" cy="400" r="220"/>
+    <path d="M60 60h680v680H60zM120 400h560M400 120v560"/>
+  </g>
+  <circle cx="400" cy="400" r="135" fill="#070706" stroke="#d7aa52" stroke-width="2"/>
+  <text x="400" y="430" text-anchor="middle" fill="#f4d98b" font-family="Georgia,serif" font-size="90">NR</text>
+  <text x="400" y="115" text-anchor="middle" fill="#d7aa52" font-family="Arial,sans-serif" font-size="22" letter-spacing="8">LEVEL XVIII / DEMO</text>
+  <text x="400" y="705" text-anchor="middle" fill="#b8ad96" font-family="Arial,sans-serif" font-size="20" letter-spacing="3">ILUSTRAÇÃO DE TESTE</text>
+</svg>

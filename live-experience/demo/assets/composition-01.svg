@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750">
+  <title>Ilustração de demonstração: arcos dourados</title>
+  <rect width="1200" height="750" fill="#15110b"/>
+  <g fill="none" stroke="#89601e" stroke-width="2">
+    <circle cx="930" cy="375" r="300"/><circle cx="930" cy="375" r="240"/><circle cx="930" cy="375" r="180"/>
+    <path d="M70 70h1060v610H70zM70 600h1060"/>
+  </g>
+  <text x="110" y="170" fill="#d7aa52" font-family="Arial,sans-serif" font-size="22" letter-spacing="8">LEVEL XVIII / DEMO</text>
+  <text x="110" y="430" fill="#f4d98b" font-family="Georgia,serif" font-size="170">18</text>
+  <text x="110" y="650" fill="#b8ad96" font-family="Arial,sans-serif" font-size="22" letter-spacing="5">ILUSTRAÇÃO DE TESTE</text>
+</svg>
