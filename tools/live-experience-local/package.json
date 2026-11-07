@@ -1,0 +1,17 @@
+{
+  "name": "level-xviii-live-local",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Piloto local sintético; sem Drive, autenticação de produção ou integração com o convite.",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "init": "node src/cli.mjs init",
+    "seed": "node src/cli.mjs seed",
+    "start": "node src/cli.mjs start",
+    "test": "node --test --test-concurrency=1 test/*.test.mjs",
+    "check": "node scripts/check.mjs"
+  }
+}
