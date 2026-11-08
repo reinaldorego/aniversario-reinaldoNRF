@@ -137,3 +137,152 @@ AppProperties e nomes não são identidade humana nem barreira contra usuário l
 Auditoria de segredos é baseada em padrões e não prova ausência universal. Os seis binários existentes não foram inspecionados para conteúdo sensível; sua integridade por checksum é uma verificação distinta. Detalhes e resultados em [relatório 04B.3B.11](VALIDACAO_MARCO_04B_3B_11.md).
 
 Contratos consultados offline: tipos/comentários do SDK instalado `googleapis/build/src/apis/drive/v3.d.ts` (files, parents, permissions, permissionIds, isAppAuthorized) e implementação OAuth instalada de `google-auth-library`. Não houve consulta online de documentação ou serviço Google nesta implementação.
+
+## 8. Identidade Drive — Marco 04B.3B.18.3
+
+**Estado:** implementação local autorizada, preparada e testada com dados inventados; a consulta real de identidade continua pendente de autorização própria e validação final do responsável. Baseline: `feature/live-experience`, `739fc91`, 388 testes existentes. Evento: **28/11/2026 às 21h em Belém/PA**. As seções anteriores descrevem o laboratório preservado do Marco 04B.3B.11.
+
+### 8.1 Comando e reutilização
+
+```powershell
+npm.cmd run drive:identity
+npm.cmd run drive:identity -- --dry-run
+```
+
+Os dois retornam `DRY_RUN`, scope fixo e `effects=NONE` antes de ler configuração privada, credenciais, tokens, identidade ou ACL, carregar SDK, iniciar navegador, abrir sockets, acessar rede ou gravar dados. Argumentos de fields, scope, endpoint, saída ou comando adicional são recusados sem eco. A flag de execução existe para uso **futuro**, depois de autorização expressa; nenhum processo CLI foi iniciado com essa flag nesta entrega. Os testes a tratam apenas como dado de parse ou dispatch programático com dependências mockadas.
+
+O único módulo novo, `src/drive-identity.mjs`, reutiliza SDK oficial, cliente Desktop, sessão OAuth, token store, envelope, validação de caminhos/ACL e sanitização. Não contém fluxo OAuth novo, ADC, chave de serviço ou lógica paralela de renovação. `authorizedSession()` é chamado por um adaptador que observa a referência da autorização já validada; tokens são carregados e eventualmente renovados/persistidos pelos controles anteriores. Nenhum arquivo OAuth ou laboratório foi alterado.
+
+Em futura execução autorizada, a única chamada de dados Google será `about.get` com `fields='user(permissionId,me)'`, timeout de até 15 segundos, AbortSignal e `retry=false`. O replay forçado de OAuth em erro é desativado, seguindo o laboratório. Não consulta files, permissions, pastas, fotografias ou perfil ampliado. Exige status 200 e corpo exato com somente `user`, e somente `permissionId` e `me` dentro dele; campos extras ou omitidos bloqueiam. `me` precisa ser booleano true; ID opaco textual entre 1 e 256 caracteres compatíveis com o contrato existente. Não exige que o ID seja número, e-mail, UUID ou subject OIDC.
+
+### 8.2 Preparação privada e isolamento
+
+| Configuração futura | Finalidade |
+| --- | --- |
+| `LEVEL_DRIVE_IDENTITY_DIR` | Diretório privado novo, dedicado e externo, já existente; não é criado automaticamente. |
+| `LEVEL_DRIVE_CREDENTIALS_FILE` | JSON Desktop externo existente; seu diretório representa Segredos para verificar isolamento. |
+| `LEVEL_DRIVE_TOKEN_DIR` | Diretório de Tokens existente, usado pelos validadores OAuth originais. |
+| `LEVEL_DRIVE_LAB_STATE_DIR` | Local planejado/existente do LabState, somente metadados de caminho para impedir sobreposição. |
+| `LEVEL_DRIVE_LAB_APPROVAL_FILE` | Local planejado/existente de uma aprovação; usa somente o diretório/caminho, sem ler ou gerar a aprovação. O arquivo pode estar ausente. |
+| `LEVEL_DRIVE_IDENTITY_ACCOUNT_CONFIRMED` | Deve ser exatamente `true`, declarado pelo operador somente após confirmar humanamente a conta da sessão. |
+
+Todos os caminhos são absolutos e privados, configurados somente na sessão futura. Não criar `.env` ou registrar valores/caminhos pessoais no Git/terminal/relatório. LabState pode ainda não existir como último componente do caminho, desde que o pai exista. O registro de aprovação não precisa existir: conhecer o destino planejado permite bloquear a sobreposição sem gerar uma aprovação operacional.
+
+O diretório de identidade deve ser disjunto de Tokens, do diretório de Segredos, de LabState e do diretório de LabApprovals. São recusadas igualdade e relações de ancestral/descendente, inclusive diferenças apenas de caixa no Windows. Dentro da identidade são aceitos apenas `drive-identity.json` e `drive-identity.lock`. Diretórios/caminhos não configurados, conteúdo desconhecido, paths internos ao repositório, ancestrais dele, UNC, hardlinks, junctions/symlinks ou dispositivos causam bloqueio. Os demais diretórios não são modificados nem varridos em busca de conteúdo.
+
+ACL de identidade e lock é verificada; o arquivo de identidade recebe criação `wx` e tem ACL conferida **antes de escrever bytes**. Windows conserva a política existente de usuário atual, SYSTEM e Administradores; POSIX exige proprietário e ausência de acesso por grupo/outros. Não há mudança automática de ACL nem fallback de permissões.
+
+### 8.3 Registro privado, concorrência e falhas
+
+O registro é JSON de formato exato, kind `LEVEL_XVIII_DRIVE_IDENTITY_V1`, contendo somente:
+
+| Campo | Uso privado |
+| --- | --- |
+| `ownerPermissionId`, `me` | Identificador confirmado pela resposta; me precisa ser true. |
+| `scope` | Valor fixo drive.file. |
+| `clientBinding` | Mesmo vínculo privado de cliente já usado no envelope OAuth. Nunca é impresso. |
+| `authorizedAt`, `refreshTokenExpiresAt` | Referência da autorização OAuth de origem; não representam tokens. |
+| `observedAt`, `expiresAt` | Instante da consulta e validade até uma hora, limitada pelo prazo de refresh da autorização. |
+
+Não guarda access token, refresh token, Client ID, client secret, hash de token, e-mail, nome ou foto. Campos adicionais, inclusive tokens, são recusados no carregamento. O identificador e o vínculo privado não aparecem em mensagens de sucesso/erro; stdout/stderr usam whitelist de campos e códigos estáticos. IDs parciais e hashes que permitam correlação também não são publicados.
+
+`drive-identity.lock` é criado exclusivamente antes de ler/consultar/criar identidade. Uma segunda instância ou processo é recusado. Não há timeout de recuperação do lock, reset, limpeza ou remoção automática de lock órfão. O lock é vazio e não contém identificador; a persistência do registro só começa após resposta válida e conferência da sessão.
+
+O arquivo é criado exclusivamente, sem sobrescrever destino existente. Após escrita, sync, fechamento e releitura protegida, o lock normal é liberado. Falha de escrita, sync, ACL ou confirmação final mantém arquivo e lock para revisão, mesmo quando os bytes já formam JSON válido: o carregador não aceita esse resultado incerto. Não há rename que possa sobrescrever destino nem exclusão do arquivo parcial. Crash também deixa lock, sem recuperação automática.
+
+Repetir captura de registro válido faz nova consulta mínima, exige mesma conta/cliente/autorização e devolve `IDENTITY_ALREADY_VERIFIED`, sem regravar ou estender validade. Registro vencido, desconhecido, parcial ou corrompido permanece bloqueado para revisão humana; não é substituído automaticamente.
+
+Cliente ou autorização divergentes são detectados pela referência validada do envelope. Conta divergente é detectada por nova consulta e comparação do ID, inclusive no carregador. A referência é revalidada após a consulta, com comparação do refresh token somente em memória, antes da persistência OAuth final. Não se armazena/imprime hash de token. Não executar outro processo de autorização, renovação, revogação ou edição dos tokens durante essa operação.
+
+401/403/404/429/5xx, timeout, resposta tardia, campos faltantes ou `me` ausente/falso causam erro sanitizado e impedem gravar identidade. A renovação de token pelo mecanismo OAuth original pode ocorrer antes da consulta em uma futura execução autorizada; falha posterior não desfaz essa renovação nem deve ser descrita como escrita de identidade. Nesta entrega somente MemoryTokenStore e dados sintéticos foram usados nesses caminhos.
+
+### 8.4 Carregador e futura ligação com lab-create
+
+`loadPrivateDriveIdentity()` também retorna dry-run por padrão. Quando futuramente executado com autorização própria, exige registro existente, confirmação humana, validação de ACL/caminhos, mesma autorização/cliente e **nova consulta about.get**. Portanto, não é um carregador offline quando executado. Pode receber uma expectativa privada de proprietário e recusará divergência. Retorna apenas ID e referências mínimas em memória para um consumidor confiável; nunca imprimir, serializar para saída pública ou registrar esse retorno.
+
+Nenhum gerador de aprovações foi implementado. A ligação futura deverá ler esse material privadamente e, somente sob nova autorização, preencher `ownerPermissionId` na aprovação operacional. Não usar copiar/colar pelo terminal, argumento CLI, clipboard ou arquivo público. Não inferir ID por e-mail, Client ID ou `sub`.
+
+O `lab-create` existente permanece inalterado e não passa a carregar automaticamente esse registro. Continua verificando proprietário da raiz, `owners.me`, permissionIds e ACLs de todos os recursos. Uma conta trocada bloqueia a criação; no fluxo atual isso pode consumir a reserva antes da falha, sem rearmá-la. A identidade obtida não certifica ACL remota, visibilidade dos descendentes, OIDC dos dois publicadores ou permissão de publicação.
+
+### 8.5 Procedimento futuro supervisionado — não executado
+
+1. Obter validação final desta implementação e autorização separada para uma consulta mínima de identidade, uso/renovação dos tokens e gravação privada. Login, se necessário, exige sua própria aprovação e o runbook OAuth anterior; o comando de identidade nunca o inicia.
+2. Confirmar privadamente conta pretendida, usuário de teste e cliente Desktop. `me=true` significa apenas usuário da sessão: a escolha correta da conta exige confirmação humana supervisionada, sem ampliar fields ou scopes para buscar e-mail.
+3. Preparar e revisar o diretório privado de identidade e os cinco caminhos de isolamento. Não usar pastas servidas, compartilhadas ou de sincronização pública. Não ler, alterar ou criar LabApprovals/estado do laboratório para executar esta preparação.
+4. Configurar os caminhos na sessão e declarar a confirmação da conta; desativar debug/transcrição/log HTTP, debugger e capturas de consentimento. Revisar expiração, revogação e responsáveis.
+5. Conferir os dois previews. Somente depois da autorização específica usar a flag de execução do comando `drive:identity`. Registrar apenas status/código/instante, sem caminhos, IDs, hashes ou conteúdo JSON.
+6. Em divergência, erro ou lock órfão, parar e pedir revisão específica. Não apagar, sobrescrever, ampliar scope, trocar estado do laboratório ou criar nova pasta para contornar a falha.
+7. Um consumidor futuro autorizado poderá usar o carregador privado, sabendo que ele fará nova consulta. Isso não concede autorização para gerar `lab-create` ou criar pasta. Os tokens e o registro de identidade devem ser administrados separadamente; o comando de limpeza de tokens não apaga identidade.
+
+### 8.6 Riscos e limitações
+
+- Ainda não houve consulta real. Campos opcionais, omissões, cancelamento e políticas reais podem provocar recusa conservadora. Isso não autoriza ampliar scope ou relaxar validações.
+- A declaração de confirmação da conta é um controle operacional, não prova criptográfica da identidade humana. Na primeira captura não há ID anterior para comparação; operador e conta supervisionada constituem a base da confiança.
+- Registro privado não é assinatura digital/cofre criptografado; usuário local e administradores podem editar dados/código. Referência da autorização e comparação remota detectam divergências comuns, sem garantir proteção contra adulteração coordenada por esses atores.
+- Lock é local ao diretório e filesystem, sem coordenação distribuída. Sync e bloqueio de resultados incertos não são backup contra perda completa, rollback externo ou queda de energia. Nenhum processo OAuth concorrente foi homologado.
+- Há janela entre consulta, validação e consumo futuro. Validade curta não substitui revalidação, autorização humana ou ACL do laboratório.
+- A auditoria de padrões textuais não comprova ausência universal de segredos. Os seis binários existentes continuam sem inspeção de conteúdo sensível; comparação de integridade por hash não elimina essa limitação.
+
+## 9. Relatório técnico do Marco 04B.3B.18.3
+
+O relatório está incorporado neste arquivo para respeitar a autorização de somente dois arquivos novos e quatro existentes modificados. **Status:** implementação exclusivamente local; aguardando validação final do responsável.
+
+| Ação | Arquivo relativo a tools/live-experience-local | Resultado |
+| --- | --- | --- |
+| Criado | `src/drive-identity.mjs` | CLI, consulta mínima, validação, armazenamento privado exclusivo e carregador preparado. |
+| Criado | `test/drive-identity.test.mjs` | I01–I24: mocks, testes negativos, SDK com transporte simulado, ACL real de temporários e regressão. |
+| Modificado | `package.json` | Somente script `drive:identity`; dependências/lockfile preservados. |
+| Modificado | `README.md` | Entrada, limites e link para este runbook/relatório. |
+| Modificado | `GOOGLE_DRIVE_OAUTH.md` | Reutilização da sessão e separação da identidade. |
+| Modificado | `GOOGLE_DRIVE_LAB.md` | Seções 8–9; identidade, riscos, procedimento futuro e este relatório. |
+
+Os 64 arquivos rastreados restantes de `739fc91`, incluindo todos os módulos OAuth/laboratório, suítes e fixtures anteriores, convite, frontend, motor e documentos mestres, são verificados por integridade no novo teste I21. Os hashes de baseline respeitam os bytes originais LF/CRLF sem normalizar arquivos protegidos. Nenhum registro privado operacional, aprovação lab-create, pasta Google ou mídia foi criado/consultado. Não houve login, processo CLI com execução habilitada, upload, download, commit, push, merge ou deploy.
+
+### 9.1 Evidências finais
+
+| Verificação | Resultado |
+| --- | --- |
+| `npm.cmd run check` | Aprovado: **27 arquivos** com sintaxe válida. |
+| `npm.cmd test` | **484/484 aprovados: 388 anteriores + 96 novos**, zero falhas, cancelamentos, skips ou TODOs. |
+| `npm.cmd run drive:identity` | DRY_RUN, effects=NONE, sem mudança de publicação. |
+| `npm.cmd run drive:identity -- --dry-run` | Mesmo preview seguro. |
+| `git diff --check` | Aprovado, sem erros de whitespace; Git informa apenas conversão LF/CRLF conforme configuração existente. |
+| `git status --short --branch` | Mesma branch/HEAD; somente quatro modificados e dois novos autorizados; nada staged. |
+| I21, L20, S13 e T12 | Arquivos protegidos, módulos OAuth/laboratório e suítes anteriores preservados. |
+| Auditoria de package.json | Scripts anteriores, dependências e demais campos preservados; somente um script novo. |
+
+Resumo do runner na execução final:
+
+```text
+tests 484
+pass 484
+fail 0
+cancelled 0
+skipped 0
+todo 0
+duration_ms 81857.8127
+```
+
+| Testes novos | Cobertura |
+| --- | --- |
+| I01–I04 | Dry-run sem efeitos, parse estrito, fields exatos, captura mínima, repetição sem sobrescrever e carregador privado. |
+| I05–I06 | Divergência de conta, cliente, autorização e troca de token durante consulta. |
+| I07–I10 | 21 variantes de resposta incompleta/inválida; HTTP 401/403/404/429/5xx; timeout/abort/resposta tardia; sessão/runtime inseguros. |
+| I11–I16 | Renovação pelo fluxo existente, validade curta, esquema sem tokens, ausência de vazamento, falha de gravação e expiração durante consulta. |
+| I17–I20 | Lock entre processos, reinício, preservação de sentinelas sintéticas de outros diretórios, sobreposição de caminhos, corrupção, hardlink, junction e ACL insegura. |
+| I21–I22 | Integridade dos 64 arquivos protegidos; SDK oficial com transporte mockado, fields mínimos e tentativa única em erros HTTP. |
+| I23–I24 | Falhas de write/sync, colisão de destino e ACL antes dos bytes deixam arquivo/lock bloqueados, sem sobrescrita ou publicação de resultado incerto. |
+
+Os testes usam tokens, IDs, aprovações fictícias/sentinelas e respostas exclusivamente sintéticos; nenhum transporte Google é usado. A suíte anterior inclui apenas servidores HTTP loopback de teste. Os temporários novos são externos, têm ACL privada e teardown com verificação de raiz/prefixo antes da exclusão pontual. Somente dados inventados são colocados nesses temporários.
+
+As execuções com ACL real de temporários ocorreram no ambiente de teste já autorizado fora da sandbox. O bloqueio histórico da sandbox sobre temporários privados permanece documentado no relatório 04B.3B.11. Nenhum teste foi desativado ou controle de ACL enfraquecido para contornar esse limite.
+
+Durante desenvolvimento, corrigiram-se somente o relógio da fixture do SDK e a chamada de restauração dos mocks novos de fs.open. A primeira execução completa apontou cinco falhas do harness; depois da correção a suíte completa passou. Não houve alteração de módulos protegidos, expectativas anteriores ou controles de segurança para corrigir essas falhas.
+
+### 9.2 Auditoria e pendências de aceite
+
+Varredura textual local de **68 rastreados** (62 textuais e seis binários excluídos da inspeção de conteúdo), **dois novos textuais** e **3.045 ignorados**. Foram usados padrões de chaves Google/OAuth, tokens conhecidos, blocos privados, JWT, literais sensíveis e tokens de convidado em query. Nenhum segredo foi identificado pelos padrões utilizados; fixtures explícitas e sete exemplos comentados do SDK foram classificados sem imprimir valores. Não foram criados logs, manifesto operacional, token file ou registro real de identidade dentro do repositório.
+
+A varredura não é conclusiva para ausência universal de segredos, não abrange conteúdo sensível dos seis binários nem credenciais externas/histórico/backups. Os binários são preservados por checksum, sem inspeção visual ou de dados embutidos. As limitações da seção 8.6 continuam abertas.
+
+**Aguardando validação final do responsável:** revisão dos seis arquivos, evidências, isolamento e aceitação dos riscos. Depois desse aceite, ainda será necessária autorização separada para consulta real de identidade, uso/renovação de tokens e escrita privada, com conta pretendida supervisionada. Login, geração de lab-create, criação/inspeção de pasta, fotos, publicação e produção continuam fora da autorização desta entrega.

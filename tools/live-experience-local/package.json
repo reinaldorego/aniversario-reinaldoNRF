@@ -20,7 +20,8 @@
     "drive:revoke": "node src/drive-cli.mjs revoke",
     "drive:clean-local": "node src/drive-cli.mjs clean-local",
     "drive:lab-create": "node src/drive-lab-cli.mjs lab-create",
-    "drive:lab-inspect": "node src/drive-lab-cli.mjs lab-inspect"
+    "drive:lab-inspect": "node src/drive-lab-cli.mjs lab-inspect",
+    "drive:identity": "node src/drive-identity.mjs"
   },
   "dependencies": {
     "googleapis": "189.0.0"

@@ -6,6 +6,8 @@ Conta exclusiva, projeto `level-xviii-live-2026`, API ativada, OAuth External/Te
 
 **Complemento 04B.3B.11:** o [laboratório sintético](GOOGLE_DRIVE_LAB.md) prepara criação única de pasta na raiz do My Drive e inspeção por uma **CLI separada**, com aprovação consumível e dry-run padrão. Os quatro módulos OAuth e seus testes foram preservados. As descrições abaixo de ausência de create/upload referem-se à CLI OAuth original e ao estado histórico do 04B.3A. Não houve login, operação Google real, upload, compartilhamento ou ampliação de scope no complemento; o primeiro login e as ações reais continuam pendentes de autorização própria. Resultados em [validação 04B.3B.11](VALIDACAO_MARCO_04B_3B_11.md).
 
+**Complemento 04B.3B.18.3:** `drive:identity` acrescenta uma CLI isolada para preparar consulta mínima `about.get`, campos exatos `user(permissionId,me)`, reaproveitando `loadGoogleSdk`, `loadDesktopCredentials`, `authorizedSession`, `validateTokenEnvelope` e `DriveTokenStore` sem alterar seus módulos. Dry-run antecede efeitos; a execução real futura exige autorização própria, confirmação humana da conta e flag explícita. A captura usa os tokens privados existentes; eventual renovação/persistência continua com a implementação OAuth original. Não inicia login automaticamente. Identidade e vínculo do cliente são mantidos somente em armazenamento privado separado, nunca no terminal ou no envelope de tokens. O carregador preparado revalida a conta por consulta mínima quando explicitamente executado; não gera aprovação ou altera o laboratório. [Runbook, limites e relatório](GOOGLE_DRIVE_LAB.md#8-identidade-drive--marco-04b3b183). Nenhuma consulta Google real foi realizada neste complemento.
+
 ## 1. Separação de responsabilidades
 
 | Arquivo | Função |
