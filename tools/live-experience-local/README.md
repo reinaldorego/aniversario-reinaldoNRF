@@ -159,3 +159,9 @@ Referências de implementação: [PNG/W3C](https://www.w3.org/TR/png-3/), [Node 
 [Contrato, campos utilizados e limites do mock](DRIVE_MOCK.md) e [resultados D01–D19](VALIDACAO_MARCO_04B_2.md). A suíte completa tem 101 testes/subtestes, incluindo os 33 anteriores, todos aprovados. `npm.cmd run check` e `npm.cmd test` continuam sendo os comandos de validação. Nenhuma dependência foi adicionada. Não existe configuração que conecte a CLI padrão ao Google Drive real.
 
 O parágrafo acima registra a entrega histórica 04B.2. O 04B.3A preserva esses 101 testes e acrescenta testes de OAuth/segurança, SDK e comandos separados. A CLI padrão `src/cli.mjs` permanece inalterada; `src/drive-cli.mjs` começa sempre em dry-run. As versões e o total final estão no relatório 04B.3A.
+
+## Marco 04B.3B.11 — laboratório sintético offline
+
+[Runbook do laboratório](GOOGLE_DRIVE_LAB.md) e [relatório técnico](VALIDACAO_MARCO_04B_3B_11.md). Os comandos `npm.cmd run drive:lab-create` e `npm.cmd run drive:lab-inspect` usam a nova `src/drive-lab-cli.mjs`, ambos em **dry-run por padrão**, antes de qualquer leitura privada, SDK, rede, socket ou escrita. A CLI OAuth e o simulador permanecem inalterados.
+
+A implementação prepara uma criação única na raiz do My Drive, aprovação humana externa consumível, estado privado com lock exclusivo e inspeção conservadora por arquivo. Repetição ou resultado incerto não permitem outra criação. Não há upload, transferência de mídia, compartilhamento, acesso editorial ou integração com publicação. Nenhum processo CLI com flag de execução ou operação Google real foi executado neste marco; login e cada ação real futura exigem aprovação própria. Testes usam somente mocks, SDK com transporte simulado e temporários sintéticos com ACL privada, sem enfraquecer permissões por restrições da sandbox.

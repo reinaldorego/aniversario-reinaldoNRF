@@ -4,6 +4,8 @@
 
 Conta exclusiva, projeto `level-xviii-live-2026`, API ativada, OAuth External/Testing, cliente Desktop v2 e pastas privadas são informações fornecidas pelo responsável. Não foram inspecionados no Google. Nenhuma credencial real foi lida, copiada ou registrada e nenhuma pasta Cloud/Drive foi criada neste marco.
 
+**Complemento 04B.3B.11:** o [laboratório sintético](GOOGLE_DRIVE_LAB.md) prepara criação única de pasta na raiz do My Drive e inspeção por uma **CLI separada**, com aprovação consumível e dry-run padrão. Os quatro módulos OAuth e seus testes foram preservados. As descrições abaixo de ausência de create/upload referem-se à CLI OAuth original e ao estado histórico do 04B.3A. Não houve login, operação Google real, upload, compartilhamento ou ampliação de scope no complemento; o primeiro login e as ações reais continuam pendentes de autorização própria. Resultados em [validação 04B.3B.11](VALIDACAO_MARCO_04B_3B_11.md).
+
 ## 1. Separação de responsabilidades
 
 | Arquivo | Função |

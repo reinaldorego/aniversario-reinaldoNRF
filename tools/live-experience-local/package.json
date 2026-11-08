@@ -18,7 +18,9 @@
     "drive:connectivity": "node src/drive-cli.mjs connectivity",
     "drive:read-synthetic": "node src/drive-cli.mjs read-synthetic",
     "drive:revoke": "node src/drive-cli.mjs revoke",
-    "drive:clean-local": "node src/drive-cli.mjs clean-local"
+    "drive:clean-local": "node src/drive-cli.mjs clean-local",
+    "drive:lab-create": "node src/drive-lab-cli.mjs lab-create",
+    "drive:lab-inspect": "node src/drive-lab-cli.mjs lab-inspect"
   },
   "dependencies": {
     "googleapis": "189.0.0"
