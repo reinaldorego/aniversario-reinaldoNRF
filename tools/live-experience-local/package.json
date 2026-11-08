@@ -22,7 +22,8 @@
     "drive:lab-create": "node src/drive-lab-cli.mjs lab-create",
     "drive:lab-inspect": "node src/drive-lab-cli.mjs lab-inspect",
     "drive:identity": "node src/drive-identity.mjs",
-    "drive:lab-prepare": "node src/drive-lab-approval.mjs"
+    "drive:lab-prepare": "node src/drive-lab-approval.mjs",
+    "drive:lab-diagnose": "node src/drive-lab-diagnose.mjs"
   },
   "dependencies": {
     "googleapis": "189.0.0"

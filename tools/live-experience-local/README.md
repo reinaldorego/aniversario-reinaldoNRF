@@ -1,5 +1,11 @@
 # LIVE EXPERIENCE — simulador local e preparação OAuth 04B.3A
 
+O Marco **04B.3B.18.17** acrescenta `npm.cmd run drive:lab-diagnose`, com `phase=DRY_RUN` por padrão,
+antes de ler configuração ou arquivos privados. O comando independente prepara somente leitura local
+do journal/claim, com ACL, checksum, consistência e estabilidade; não usa OAuth, rede ou escrita.
+A execução operacional continua pendente de validação e autorização específicas. Contrato dos nove
+campos, limites da evidência e procedimento supervisionado na seção 12 de [GOOGLE_DRIVE_LAB.md](GOOGLE_DRIVE_LAB.md).
+
 O simulador de sincronização continua **inteiramente local e sintético**, isolado do convite, Apps Script, Sheets, internet, frontend e convidados. O Marco 04B.3A acrescenta uma CLI OAuth independente, com dry-run padrão; nenhum login ou acesso real ao Drive foi executado. Não é backend de produção nem autenticação de publicadores/leitores. A numeração 04B.1 corresponde à prova local prevista como 04B.0 no plano 04A.2, sem executar a conexão real ali chamada 04B.1.
 
 Leia [Google Drive OAuth: segurança, comandos e autorização futura](GOOGLE_DRIVE_OAUTH.md) e [validação 04B.3A](VALIDACAO_MARCO_04B_3A.md). A CLI nova não alimenta o motor de publicação, não cria recursos Drive e não modifica as três pastas reais.

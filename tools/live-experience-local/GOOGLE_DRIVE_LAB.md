@@ -1,5 +1,10 @@
 # Laboratório Drive — Marco 04B.3B.11
 
+O diagnóstico local do **Marco 04B.3B.18.17** está descrito nas seções 12 e 13. As seções anteriores
+são registros históricos de implementação e testes offline; não descrevem o resultado das operações
+supervisionadas posteriores informadas pelo responsável. Nesta etapa de diagnóstico não houve leitura
+dos arquivos privados reais nem consulta Google.
+
 **Estado:** preparação implementada e testada offline com mocks. Não houve login, chamada Google real, criação de pasta, leitura de fotos ou transferência de mídia. A aprovação desta implementação não autoriza operações reais. Evento: **28/11/2026 às 21h em Belém/PA**.
 
 ## 1. Comandos isolados
@@ -434,3 +439,181 @@ Auditoria de escopo confirmou exatamente cinco arquivos autorizados. A varredura
 O resultado desta entrega é código e evidência de testes locais. **Aprovação operacional real não foi gerada, LabState real não foi lido/modificado e pasta Drive não foi criada.** Não houve execução CLI com dados privados reais, acesso Google, upload/download, alteração de permissões na nuvem, atualização de dependências ou commit.
 
 **Aguardando validação final do responsável:** revisão do inventário, testes, publicação NTFS, margem de validade e limitações. A preparação real futura exige autorização específica de leitura/gravação local e condições da seção 10.6. A autorização já informada para uma pasta futura continua separada e não foi executada. Preparação offline não comprova ausência de revogação remota e não substitui identidade e permissões no momento da criação.
+
+## 12. Diagnóstico local sanitizado — Marco 04B.3B.18.17
+
+Baseline: `feature/live-experience`, `91c725f`, 547 testes anteriores, Git inicialmente limpo.
+O responsável informou um `DRIVE_HTTP_404` em criação real, seguido de journal e claim existentes.
+O diagnóstico operacional desses arquivos permanece pendente de validação e autorização próprias.
+Esta implementação usa exclusivamente fixtures inventadas e temporários de teste.
+
+### 12.1 Comando e isolamento
+
+```powershell
+npm.cmd run drive:lab-diagnose
+npm.cmd run drive:lab-diagnose -- --dry-run
+```
+
+Ambos são previews, com `phase=DRY_RUN`. Para manter exclusivamente os nove campos autorizados,
+não se acrescentam `mode`, `error`, scope, nomes, caminhos, timestamps ou contagens à saída.
+Todos os outros campos retornam `UNKNOWN`: o preview não inspeciona configuração, ACL ou arquivos.
+`npm.cmd run --silent drive:lab-diagnose` omite também o cabeçalho padrão do npm.
+
+`src/drive-lab-diagnose.mjs` importa apenas filesystem/path/url e os módulos existentes de estado e
+proteção privada. Não importa SDK, sessão OAuth, identidade, preparador, motor de criação ou publicação.
+Não carrega credenciais, tokens, aprovação ou identidade. Não solicita renovação nem usa rede, sockets,
+navegador ou API Google. Não chama `withLock()`, writer, criação, recuperação ou limpeza de estado.
+Os únicos arquivos abertos são os dois nomes fixos de journal e claim, em `O_RDONLY`.
+Leituras comuns podem atualizar atime pelo sistema operacional; não há gravação de conteúdo/estado pela ferramenta.
+
+### 12.2 Leitura protegida e concorrência
+
+Uma futura leitura executada requer somente `LEVEL_DRIVE_LAB_STATE_DIR`, mantendo o diretório já
+vinculado ao laboratório. Não aceitar destino alternativo para contornar falhas. O operador precisa
+parar todos os comandos capazes de alterar o laboratório e confirmar isso na sessão com
+`LEVEL_DRIVE_LAB_DIAGNOSE_QUIESCENT=true`. A confirmação não substitui a autorização humana.
+
+O leitor reutiliza `validateExternalPath()`, `assertPrivatePermissions()`, `DriveLabState.read()` e
+`readPrivateJson()`: caminho externo, arquivo regular de link único, sem symlink/junction/UNC, ACL privada,
+JSON limitado, schema do estado e envelope com checksum. Não enfraquece nem corrige ACL automaticamente.
+Diretório deve conter exatamente journal e claim; lock, temporário, arquivo ausente ou desconhecido bloqueia
+antes de abrir conteúdo privado. Lock ativo e lock órfão recebem a mesma recusa: nada é removido.
+
+Há três snapshots do diretório e dos dois arquivos, envolvendo duas leituras completas e validadas.
+Snapshots verificam nomes, ausência de lock, identidade dos arquivos, modo/proprietário/link count,
+tamanho, criação, ctime e mtime. Os campos ficam somente em memória. O leitor privado existente verifica
+também identidade e estabilidade durante cada leitura. Os dois pares de conteúdo e os três snapshots
+precisam concordar; qualquer troca, escrita, mudança de ACL ou sinal de concorrência bloqueia sem retry.
+atime fica fora da comparação porque uma leitura pode atualizá-lo.
+
+**Limite:** ausência de lock e snapshots estáveis não constituem exclusão mútua ou snapshot transacional.
+Sem criar lock não é possível impedir um escritor de iniciar após a última observação, nem demonstrar
+ausência absoluta de outro processo. O protocolo depende de repouso confirmado pelo operador e de
+escritores cooperativos; qualquer dúvida impede uso operacional. Usuário local/administradores e a
+resolução temporal do filesystem continuam parte da fronteira de confiança.
+
+### 12.3 Consistência e contrato da saída
+
+Além do schema existente, exige criação reservada, pelo menos uma aprovação consumida e claim com
+as quatro chaves exatas. Operação, cliente e proprietário devem coincidir privadamente com o journal.
+`RESERVED`/`BLOCKED` exigem tentativa falsa, referências nulas e uma única aprovação consumida.
+`UNCERTAIN` exige tentativa verdadeira e referência da raiz; a referência de pasta pode faltar.
+`CREATED` exige tentativa e ambas as referências. Combinações incompatíveis são recusadas.
+
+| Campo | Significado em diagnóstico válido |
+| --- | --- |
+| `integrityValid` | Schema, checksum, consistência e requisitos adicionais passaram. Não é assinatura digital. |
+| `phase` | Uma das quatro fases persistidas e validadas. |
+| `createAttempted` | Intenção durável registrada; true não comprova envio da requisição. |
+| `rootReferencePresent` | Existe referência válida da raiz, sem revelar seu valor. |
+| `folderReferencePresent` | Existe referência válida da pasta, sem revelar seu valor. |
+| `claimMatchesJournal` | Claim exato e seus três vínculos concordam com o journal. |
+| `approvalConsumed` | Há registro de consumo no journal associado à reserva com claim válido. Não identifica nem revalida um arquivo de aprovação específico. |
+| `stateStable` | As leituras e snapshots concordaram durante a janela observada. Não impede alterações posteriores. |
+| `remoteCreationProven` | false para `RESERVED`/`BLOCKED`; `UNKNOWN` para `UNCERTAIN`, mesmo com referência de pasta; true somente para `CREATED`. |
+
+O último campo representa **evidência histórica local**: `CREATED` registra a conclusão das inspeções
+do motor existente. Não prova existência atual no Drive, ausência de revogação, segurança atual da ACL,
+nem resiste a adulteração/rollback por usuário local confiável. false diz apenas que esta reserva não
+registrou intenção de envio; não é inventário remoto nem prova global de inexistência de pastas.
+Sem abrir a aprovação ou os arquivos OAuth/identidade, o diagnóstico não verifica o approvalId
+operacional específico, o stateBinding daquela aprovação, a conta atualmente autorizada ou a validade
+da concessão. Confere somente os vínculos concordantes entre os dois arquivos locais selecionados.
+
+Qualquer falha devolve exit code 1 e somente os mesmos nove campos em stderr:
+`integrityValid=false`, `stateStable=false` e os demais `UNKNOWN`, inclusive `phase`.
+false nesses dois campos significa validação/estabilidade não comprovada; a ferramenta não publica
+diagnóstico parcial. Não imprime mensagem, code ou stack da exceção. Sucesso/preview usa stdout e code 0.
+Nem falha nem sucesso consomem aprovação ou modificam fase, journal, claim ou lock.
+
+### 12.4 Procedimento supervisionado futuro — não executado
+
+1. Obter validação desta implementação e autorização específica para ler somente o journal/claim real.
+2. Confirmar baseline, ambiente sem debug/transcrição, diretório privado original e comandos operacionais parados.
+3. Configurar privadamente apenas o diretório de estado e declarar repouso com a variável indicada acima.
+   Não imprimir ambiente, caminhos ou conteúdo JSON. Não mudar ACL para fazer o diagnóstico passar.
+4. Conferir o preview. Somente depois da autorização usar a flag de execução do comando **de diagnóstico**.
+   O comando preparado seria `npm.cmd run --silent drive:lab-diagnose -- --execute`; não foi executado nesta entrega.
+5. Guardar somente os nove campos sanitizados. Em falha, preservar todos os arquivos e solicitar revisão;
+   não retirar lock, resetar journal, regenerar aprovação ou repetir criação.
+6. `BLOCKED` com tentativa falsa direciona investigação às etapas anteriores à criação. `UNCERTAIN`
+   exige tratar a criação remota como possível. `CREATED` constitui evidência histórica local.
+   Nenhum resultado identifica sozinho qual chamada produziu o 404 nem autoriza consulta Google.
+7. Avaliar separadamente eventual reconciliação remota de leitura. O `lab-inspect` existente começa
+   pela raiz e grava consumo/journal localmente, portanto não é substituto deste diagnóstico sem escrita.
+
+## 13. Relatório técnico do Marco 04B.3B.18.17
+
+| Inventário | Alteração |
+| --- | --- |
+| Criado: `src/drive-lab-diagnose.mjs` | CLI e leitor somente de leitura, sem reutilizar writers/locks. |
+| Criado: `test/drive-lab-diagnose.test.mjs` | Fixtures inventadas, filesystem temporário e verificações negativas/preservação. |
+| Modificado: `package.json` | Apenas script `drive:lab-diagnose`, sem novas dependências. |
+| Modificado: `README.md` | Entrada do novo comando e referência ao contrato. |
+| Modificado: `GOOGLE_DRIVE_LAB.md` | Runbook, limites da evidência e relatório desta etapa. |
+
+Os 547 testes anteriores e os módulos de criação/OAuth/identidade/preparador/publicação permanecem
+intactos. A preservação contra `91c725f` é verificada também pelo novo teste D17.
+
+### 13.1 Evidências finais
+
+| Validação | Resultado |
+| --- | --- |
+| `npm.cmd run check` | Sintaxe válida em **31 arquivos**. |
+| `npm.cmd test` | **603/603 aprovados: 547 anteriores + 56 novos**; zero falhas, cancelados, skips ou TODOs. |
+| `npm.cmd run drive:lab-diagnose` | Preview com exatamente nove campos, `phase=DRY_RUN` e demais valores `UNKNOWN`. |
+| `git diff --check` | Sem erros de whitespace. Avisos LF/CRLF de checkout não alteram o resultado. |
+| `git status --short --branch` | Branch preservada e somente os cinco arquivos do inventário pendentes. HEAD continua `91c725f`. |
+| D17 e preservações históricas | Arquivos protegidos de todos os baselines anteriores, testes e módulos operacionais intactos. Package mantém todos os scripts e dependências anteriores. |
+| Varredura textual limitada | Cinco arquivos públicos desta entrega inspecionados; zero ocorrências dos padrões selecionados de credenciais. Nenhum arquivo privado inspecionado. |
+
+Trecho final da execução completa, duração de teste pública (não é timestamp privado):
+
+```text
+tests 603
+pass 603
+fail 0
+cancelled 0
+skipped 0
+todo 0
+duration_ms 282691.7913
+```
+
+| Cobertura nova | Evidência |
+| --- | --- |
+| D01–D02 | Dry-run anterior a ambiente/IO/rede/SDK e flags recusadas sem eco. |
+| D03 | Cinco cenários reais de filesystem temporário: quatro fases e UNCERTAIN com/sem referência de pasta. |
+| D04–D06 | Vínculos divergentes, schema/checksum inválidos, JSON parcial, consumo e combinações ambíguas. |
+| D07–D10 | Lock ativo/órfão e itens inesperados antes de abrir bytes; confirmação de repouso; paths, junction/symlink, hardlink e ACLs inseguras. |
+| D11–D13 | Troca de conteúdo/metadados entre passagens; escrita, substituição, alteração de ACL e lock transitório no filesystem; mudança dentro da leitura privada. |
+| D14–D16 | Somente quatro aberturas O_RDONLY dos dois arquivos sintéticos; mutadores/writers/lock/rede proibidos; bytes preservados; stdout/stderr limitados aos nove campos; sem retry automático. |
+| D17 | Preservação de todo o baseline 91c725f, incluindo testes anteriores; apenas um script adicionado ao package. |
+
+A primeira tentativa da suíte nova na sandbox não validou o filesystem privado: houve
+`PRIVATE_PATH_UNAVAILABLE` e falhas em cascata ligadas à restrição de acesso/ACL. A repetição autorizada
+fora da sandbox, sem alterar os validadores ou abrir permissões para contornar a restrição, passou
+55/56 testes. A falha restante era a fixture D11: o caso de alteração de conteúdo produzia um estado
+semanticamente inválido antes de alcançar a comparação de estabilidade. A fixture foi corrigida para
+usar um estado UNCERTAIN válido; as asserções negativas de JSON/checksum e diretório foram reforçadas.
+A execução completa posterior, fora da sandbox, passou 603/603. Nenhum teste anterior foi modificado.
+
+ACLs abertas nos casos negativos existem somente em temporários sintéticos para demonstrar recusa.
+O setup dos demais temporários usa ACL privada; o teardown confere diretório/prefixo antes de remover
+somente o scratch criado pelo teste. As suítes históricas preservadas incluem servidores loopback
+simulados; o diagnóstico novo não inicia servidor nem conexão de rede. Não houve processo CLI do
+diagnóstico com `--execute`: os caminhos executados foram testados por chamadas programáticas com
+fixtures, inclusive testes de dispatch/parser. Não foi lido LabState real.
+
+### 13.2 Limitações e aceite pendente
+
+Os limites de concorrência, confiança no armazenamento local, significado histórico do campo remoto,
+impossibilidade de revalidar aprovação/conta e impossibilidade de localizar a chamada exata do 404
+estão descritos na seção 12. O diagnóstico não reconcilia, reabre ou libera a criação.
+A varredura textual de cinco arquivos é limitada a padrões: não é auditoria universal, não inspeciona
+os seis binários históricos, arquivos privados, histórico completo ou backups.
+
+Resultado desta etapa: implementação e testes locais concluídos, aguardando validação do responsável.
+**Nenhum arquivo privado real foi lido; nenhuma aprovação operacional foi gerada; LabState real não
+foi alterado; nenhuma chamada Google ou criação remota foi realizada.** Não houve alteração de escopo,
+dependências, motor de criação/publicação, frontend, RSVP, QR, Access Pass, check-in ou Service Worker.
+Não houve commit, push, merge ou deploy. O diagnóstico operacional exige autorização posterior.
