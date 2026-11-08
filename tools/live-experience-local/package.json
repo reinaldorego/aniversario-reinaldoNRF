@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Piloto local sintético; sem Drive, autenticação de produção ou integração com o convite.",
+  "description": "Piloto sintético e preparação OAuth local isolada, com dry-run padrão; sem publicação real.",
   "engines": {
     "node": ">=24 <25"
   },
@@ -12,6 +12,15 @@
     "seed": "node src/cli.mjs seed",
     "start": "node src/cli.mjs start",
     "test": "node --test --test-concurrency=1 test/*.test.mjs",
-    "check": "node scripts/check.mjs"
+    "check": "node scripts/check.mjs",
+    "drive:diagnose": "node src/drive-cli.mjs diagnose",
+    "drive:authorize": "node src/drive-cli.mjs authorize",
+    "drive:connectivity": "node src/drive-cli.mjs connectivity",
+    "drive:read-synthetic": "node src/drive-cli.mjs read-synthetic",
+    "drive:revoke": "node src/drive-cli.mjs revoke",
+    "drive:clean-local": "node src/drive-cli.mjs clean-local"
+  },
+  "dependencies": {
+    "googleapis": "189.0.0"
   }
 }

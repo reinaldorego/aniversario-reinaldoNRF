@@ -1,16 +1,19 @@
-# LIVE EXPERIENCE — piloto local 04B.1 e adaptador simulado 04B.2
+# LIVE EXPERIENCE — simulador local e preparação OAuth 04B.3A
 
-Prova de sincronização **inteiramente local e sintética**, isolada do convite. Não conecta Google Drive, Apps Script, Sheets, internet, frontend ou convidados. Não é backend de produção nem autenticação de publicadores/leitores. A numeração 04B.1 desta entrega segue o pedido atual: corresponde à prova local prevista como 04B.0 no plano 04A.2, sem executar a etapa de conexão real ali chamada 04B.1.
+O simulador de sincronização continua **inteiramente local e sintético**, isolado do convite, Apps Script, Sheets, internet, frontend e convidados. O Marco 04B.3A acrescenta uma CLI OAuth independente, com dry-run padrão; nenhum login ou acesso real ao Drive foi executado. Não é backend de produção nem autenticação de publicadores/leitores. A numeração 04B.1 corresponde à prova local prevista como 04B.0 no plano 04A.2, sem executar a conexão real ali chamada 04B.1.
+
+Leia [Google Drive OAuth: segurança, comandos e autorização futura](GOOGLE_DRIVE_OAUTH.md) e [validação 04B.3A](VALIDACAO_MARCO_04B_3A.md). A CLI nova não alimenta o motor de publicação, não cria recursos Drive e não modifica as três pastas reais.
 
 ## Instalar e testar
 
-Requer Node.js **24.x**; validado com v24.21.0 e npm 11.19.0 em Windows. Não há dependências de terceiros: **não precisa executar npm install**, baixar pacote, criar conta ou credencial. package.json é privado; não há package-lock porque não há árvore de dependências a instalar.
+Requer Node.js **24.x**; validado com v24.21.0 e npm 11.19.0 em Windows, sem atualizar esses programas. O 04B.3A usa somente uma dependência direta, o SDK oficial `googleapis` **189.0.0**, com versões transitivas fixadas em `package-lock.json`. A suíte completa exige instalar essa árvore; os comandos do simulador continuam sem importar o SDK. `package.json` permanece privado.
 
 Na raiz do projeto:
 
 ```powershell
 Set-Location tools/live-experience-local
 node --version
+npm.cmd ci --ignore-scripts
 npm.cmd run check
 npm.cmd test
 npm.cmd run seed
@@ -138,7 +141,7 @@ O código do álbum e OIDC dos publicadores **não estão implementados**: não 
 
 ## Limites e migração futura
 
-1. O Marco 04B.2 acrescenta fonte Drive com cliente em memória, paginação, ACL simulada, checkpoint e revalidação por interface. LocalSource continua padrão. Antes de conexão real, implementar/comprovar ACL direta/herdada real, duas identidades, OAuth isolado, bootstrap/reconciliação e certificação.
+1. O Marco 04B.2 acrescenta fonte Drive com cliente em memória, paginação, ACL simulada, checkpoint e revalidação por interface. LocalSource continua padrão. O 04B.3A prepara OAuth isolado, testado com mocks e SDK offline; antes de qualquer conexão real, obter aprovação do 04B.3B. ACL direta/herdada real, duas identidades, bootstrap/reconciliação e certificação continuam sem prova real.
 2. Escolher provedor/banco/fila/cofre e locks/transações distribuídos. Lock de PID é somente local; se recuperação interromper com recovery.lock ou lock inválido, parar e revisar manualmente, sem forçar reset. PID reutilizado pode bloquear recuperação até revisão.
 3. Implementar código de álbum e OIDC/allowlist verdadeiros, antes de conteúdo real. Exigir política de mídia/retirada/TTL, logs e orçamento aprovados.
 4. Substituir codec de teste por biblioteca/worker de imagens mantidos e isolados, com formatos e limites homologados; justificar dependências e medir qualidade/CPU. Não levar este parser de perfil restrito diretamente para produção.
@@ -154,3 +157,5 @@ Referências de implementação: [PNG/W3C](https://www.w3.org/TR/png-3/), [Node 
 ## Marco 04B.2 — Drive API simulado
 
 [Contrato, campos utilizados e limites do mock](DRIVE_MOCK.md) e [resultados D01–D19](VALIDACAO_MARCO_04B_2.md). A suíte completa tem 101 testes/subtestes, incluindo os 33 anteriores, todos aprovados. `npm.cmd run check` e `npm.cmd test` continuam sendo os comandos de validação. Nenhuma dependência foi adicionada. Não existe configuração que conecte a CLI padrão ao Google Drive real.
+
+O parágrafo acima registra a entrega histórica 04B.2. O 04B.3A preserva esses 101 testes e acrescenta testes de OAuth/segurança, SDK e comandos separados. A CLI padrão `src/cli.mjs` permanece inalterada; `src/drive-cli.mjs` começa sempre em dry-run. As versões e o total final estão no relatório 04B.3A.
