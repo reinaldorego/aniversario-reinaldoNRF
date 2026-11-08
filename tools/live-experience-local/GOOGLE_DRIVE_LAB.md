@@ -286,3 +286,151 @@ Varredura textual local de **68 rastreados** (62 textuais e seis binários exclu
 A varredura não é conclusiva para ausência universal de segredos, não abrange conteúdo sensível dos seis binários nem credenciais externas/histórico/backups. Os binários são preservados por checksum, sem inspeção visual ou de dados embutidos. As limitações da seção 8.6 continuam abertas.
 
 **Aguardando validação final do responsável:** revisão dos seis arquivos, evidências, isolamento e aceitação dos riscos. Depois desse aceite, ainda será necessária autorização separada para consulta real de identidade, uso/renovação de tokens e escrita privada, com conta pretendida supervisionada. Login, geração de lab-create, criação/inspeção de pasta, fotos, publicação e produção continuam fora da autorização desta entrega.
+
+## 10. Preparador offline — Marco 04B.3B.18.8
+
+**Baseline:** `feature/live-experience`, `d2ec6bb`, 484 testes existentes e Git inicialmente limpo. **Escopo desta entrega:** implementação local, documentação e testes com fixtures e temporários sintéticos. Nenhum arquivo real de credenciais, tokens, identidade ou laboratório foi lido. Nenhuma aprovação operacional foi gerada. Evento preservado: **28/11/2026 às 21h em Belém/PA**.
+
+O responsável informou consulta real de identidade bem-sucedida e estado privado preparado antes desta etapa. Esses dados são contexto fornecido, sem reinspeção nesta implementação. As seções anteriores registram os marcos históricos; não descrevem novas consultas ou liberações automáticas.
+
+### 10.1 Comando e contrato
+
+```powershell
+npm.cmd run drive:lab-prepare
+npm.cmd run drive:lab-prepare -- --dry-run
+```
+
+Ambos retornam `DRY_RUN`, `effects=NONE`, `googleContacted=false` e `publicationChanged=false`. O retorno precede leitura de ambiente privado, arquivos/ACL, SDK, sockets, rede, entropia operacional e escrita. Não há CLI para informar payload, IDs, scope, validade ou destino arbitrários. Uma futura gravação exige autorização humana específica e flag explícita; nenhum processo CLI com execução habilitada foi iniciado nesta entrega. Testes usam dispatch programático e configuração exclusivamente sintética.
+
+O preparador valida e produz somente os dez campos exatos de `LEVEL_XVIII_DRIVE_LAB_APPROVAL_V1`:
+
+| Campo | Regra |
+| --- | --- |
+| kind | Constante `LEVEL_XVIII_DRIVE_LAB_APPROVAL_V1`. |
+| action | Sempre `lab-create`. |
+| approvalId | `randomBytes(32)` em hexadecimal minúsculo, 64 caracteres / 256 bits. |
+| operationId | `randomBytes(16)` em hexadecimal minúsculo, 32 caracteres / 128 bits. |
+| expiresAt | Menor prazo entre agora + uma hora, validade da identidade e validade da concessão OAuth. |
+| scope | Constante original `https://www.googleapis.com/auth/drive.file`. |
+| clientBinding | Obtido somente do envelope OAuth validado com as credenciais Desktop, igual ao da identidade. |
+| stateBinding | Resultado de `labDirectoryBinding()` após validar o diretório absoluto real de LabState e sua ACL. |
+| ownerPermissionId | Exclusivamente do registro privado de identidade validado. |
+| files | Sempre array vazio. |
+
+`validateLabApproval()` é usado antes da escrita, na releitura do temporário e do destino. Não se acrescentam timestamp de autorização, assinatura, checksum ou wrapper ao V1. A integridade da preparação é verificada por esquema, comparação integral privada, leitura estável, ACL e identidade do arquivo no filesystem, sem publicar hashes de associação.
+
+Exigem-se pelo menos **cinco minutos restantes** de validade, rechecados durante e depois da publicação. A margem é fixa, sem flag para reduzi-la, e não garante duração do ensaio real. Identidade vencida, referência OAuth incompatível ou tempo insuficiente bloqueiam; não há extensão automática de prazo, nova identidade ou renovação de tokens.
+
+### 10.2 Configuração futura e isolamento
+
+Reutilizam-se os cinco caminhos existentes: `LEVEL_DRIVE_CREDENTIALS_FILE`, `LEVEL_DRIVE_TOKEN_DIR`, `LEVEL_DRIVE_IDENTITY_DIR`, `LEVEL_DRIVE_LAB_STATE_DIR` e `LEVEL_DRIVE_LAB_APPROVAL_FILE`. Os diretórios de Segredos (pai das credenciais), Tokens, Identidade, LabState e LabApprovals precisam existir, ser privados e mutuamente disjuntos. Igualdade e relações de ancestral/descendente são recusadas, inclusive diferenças somente de caixa no Windows. Não se criam diretórios automaticamente.
+
+Na futura sessão supervisionada, `LEVEL_DRIVE_LAB_PREPARE_CONFIRMED` e `LEVEL_DRIVE_IDENTITY_ACCOUNT_CONFIRMED` precisam ser exatamente `true`. São declarações operacionais do responsável, não identidade criptográfica ou substituto de aprovação humana. Não criar `.env` ou registrar os valores dos caminhos no repositório.
+
+LabState deve estar **vazio**: nenhum journal, claim, lock ou arquivo inesperado. A conferência é de leitura; o preparador não chama operações que reservem criação, consumam aprovação ou gravem estado. LabApprovals aceita somente o destino configurado, `drive-lab-prepare.lock` e o temporário pertencente à operação corrente. Órfãos, conteúdo desconhecido, destino preexistente, links inesperados ou caminhos inseguros bloqueiam. O arquivo de aprovação nunca é criado dentro de LabState, Identidade, Tokens ou Segredos.
+
+São reutilizadas validações externas de paths, recusa de UNC/junctions/symlinks/hardlinks/dispositivos, ACL e runtime silencioso. Windows admite somente os principais confiáveis da política original; 0600 sozinho não certifica privacidade Windows. Nenhum controle ou ACL é alterado automaticamente.
+
+### 10.3 Leitura offline das fontes
+
+`DriveIdentityStore.withLock()` e sua leitura privada são reutilizados sem chamar o carregador de identidade que faz nova consulta. A identidade JSON é validada por `validateIdentityRecord()` contra o envelope atual. Credenciais e tokens são carregados somente pelos leitores privados existentes e `validateTokenEnvelope()`; Client ID fica restrito à memória desse fluxo e nunca é impresso ou persistido na aprovação.
+
+Conferem-se cliente, `authorizedAt`, `refreshTokenExpiresAt`, identidade, schema e scope único. As fontes são relidas antes do hardlink e novamente durante a janela de dois links. Mudanças nos metadados da autorização, identidade, access token ou refresh token bloqueiam; comparação de tokens ocorre apenas em memória, sem hash público ou persistido. Buffers de serialização e de entropia são zerados após uso; isso não garante eliminação de todas as cópias de strings no heap/OS.
+
+O preparador não carrega SDK, não inicia sessão ou login, não chama o carregador online de identidade e não consulta Google. Um access token vencido não é renovado nessa etapa: a validade local da identidade/concessão pode permitir preparar a aprovação, e eventual renovação no consumo real continua ação do fluxo OAuth existente e da autorização correspondente.
+
+### 10.4 Publicação exclusiva em Windows/NTFS
+
+Suporte operacional desta entrega: **Windows com volume local NTFS**. O tipo do volume é conferido por metadados locais via PowerShell, sem imprimir drive/path. Plataforma diferente, volume não NTFS ou impossibilidade de conferir o volume bloqueiam. O hardlink precisa funcionar nativamente no mesmo diretório/filesystem; não há fallback com rename, cópia ou substituição.
+
+1. Validar diretórios, ACL, LabState vazio e destino ausente. Adquirir o lock exclusivo próprio em LabApprovals, com ACL privada e sync. Revalidar após o lock.
+2. Sob o lock da identidade, ler e validar as fontes locais. Gerar IDs criptográficos e montar o V1 em memória; revalidar prazo e contrato.
+3. Criar temporário exclusivo no mesmo LabApprovals. Conferir tipo, inode/device, link único e ACL privada **antes de escrever bytes**. Escrever, sincronizar, fechar, reler protegidamente e comparar o objeto completo.
+4. Revalidar fontes, diretórios, ACL, prazo e destino ausente. `fs.link(temporário, destino)` publica sem substituir um nome existente. EEXIST e falhas de suporte não são contornadas.
+5. Verificar que ambos os nomes são arquivos regulares do mesmo inode/device, com exatamente dois links e tamanho esperado. Nessa janela, `readPrivateJson(destino)` rejeita o arquivo pelo nlink=2: o consumidor existente não aceita esse estado intermediário.
+6. Revalidar fontes, ACLs, LabState vazio e tempo restante. Remover somente o nome temporário próprio, deixando nlink=1. Conferir identidade do arquivo final, releitura privada e contrato. Liberar os locks próprios apenas no encerramento normal.
+
+O sucesso retorna somente status estático e flags de isolamento, sem ID, valor de associação, Client ID, token, path ou conteúdo do JSON. O preparador não inicia `drive:lab-create` e não remove o arquivo de aprovação depois de produzi-lo.
+
+### 10.5 Falhas e resultados incertos
+
+Não há retry automático. Falhas após início de escrita/publicação preservam o lock do preparador e os artefatos para revisão. Lock órfão, temporário órfão, destino existente ou resultado incerto impedem nova geração. Não gerar outros IDs, mudar nome/caminho ou limpar evidências para contornar o bloqueio.
+
+Falha de hardlink deixa temporário/lock; falha antes da remoção do temporário pode deixar dois links e o consumidor continua recusando o destino. **Falha depois de remover o temporário ou na limpeza final pode deixar uma aprovação íntegra e legível com resultado do preparador incerto.** O consumidor atual não conhece o lock do preparador: nesse caso o operador deve parar e exigir revisão humana, sem executar consumo. A entrega não promete atomicidade conjunta entre resposta do processo, disco, fontes e consumidor independente.
+
+O consumo é lógico no journal do laboratório: o arquivo de aprovação pode continuar existindo, mas approvalId consumido e claim de criação bloqueiam reutilização. O preparador não modifica esses mecanismos, não reinicializa LabState e não reemite automaticamente aprovação vencida ou usada.
+
+### 10.6 Procedimento futuro supervisionado — não executado
+
+1. Obter validação final desta implementação e autorização específica para a **geração local** com leitura das fontes privadas. A autorização informada para uma futura pasta permanece separada; esta entrega não a inicia.
+2. Conferir privadamente conta pretendida, cliente, validade da identidade/concessão, ACLs, ausência de locks/órfãos, LabState vazio e destino ausente. Preparar Windows/NTFS local e impedir processos concorrentes de OAuth, edição de fontes, preparação ou consumo.
+3. Configurar os caminhos e as confirmações operacionais somente na sessão supervisionada. Desativar debug, transcrição, logs HTTP, capturas e instrumentação sensível. Conferir dry-run.
+4. Somente após autorização específica usar a flag de execução de `drive:lab-prepare`. O efeito será exclusivamente local. Registrar apenas código/status/instante, sem abrir ou imprimir a aprovação.
+5. Em qualquer erro, parar. Não sobrescrever, repetir automaticamente, remover locks/artefatos ou executar `lab-create` para tentar resolver incerteza. Revisão/limpeza exigem ação humana autorizada separadamente.
+6. Após sucesso inequívoco e nova conferência local de condições, realizar o consumo futuro já autorizado numa janela supervisionada. Mudança de conta, cliente, concessão ou estado entre etapas exige reavaliação; não acrescentar campos ao V1 nem copiar IDs pelo terminal.
+
+**A preparação offline não comprova ausência de revogação remota e não substitui a verificação da identidade e das permissões no momento da criação.** O V1 não carrega a referência completa da concessão: as comparações locais protegem a preparação, enquanto o consumidor mantém verificação de cliente, proprietário e ACLs. Divergência no consumo pode reservar/consumir a autorização antes de bloquear; não rearmar automaticamente.
+
+Outros riscos: operador e administradores locais são fronteira de confiança; identidade privada não é assinatura digital; locks são locais ao mesmo filesystem, sem coordenação distribuída. Sync e releitura não são backup nem garantia contra queda de energia, perda/rollback de estado ou alterações coordenadas por ator local confiável. A margem de cinco minutos é conservadora e não um SLA. Campos/ACL reais ainda podem ser insuficientes no ensaio Drive, exigindo bloqueio sem ampliação de scope. Os seis binários preexistentes continuam sem inspeção de conteúdo sensível.
+
+## 11. Relatório técnico do Marco 04B.3B.18.8
+
+O relatório fica neste arquivo para respeitar o escopo autorizado de **dois novos e três modificados**. Baseline inicial confirmado: branch `feature/live-experience`, HEAD `d2ec6bb`, Git limpo. AGENTS.md, Documento Mestre e contratos existentes foram lidos antes da implementação.
+
+| Ação | Arquivo relativo a tools/live-experience-local | Entrega |
+| --- | --- | --- |
+| Criado | `src/drive-lab-approval.mjs` | Preparador offline, contrato exato, margem mínima, isolamento, lock e publicação por hardlink. |
+| Criado | `test/drive-lab-approval.test.mjs` | P01–P21: negativos, contrato/tempo, privacidade, consumo simulado e filesystem real Windows/NTFS. |
+| Modificado | `package.json` | Somente script `drive:lab-prepare`. Dependências/lockfile preservados. |
+| Modificado | `README.md` | Entrada e referência ao runbook/relatório. |
+| Modificado | `GOOGLE_DRIVE_LAB.md` | Seções 10–11: procedimentos, riscos, evidências e este relatório. |
+
+Todos os 67 arquivos restantes do baseline são protegidos pelo teste novo P21, incluindo módulos OAuth, identidade, laboratório, motor, testes anteriores, frontend e documentos mestres. O baseline original de bytes LF/CRLF é respeitado. Nenhum módulo existente ou teste anterior foi alterado. Não houve leitura de fontes reais, geração de aprovação operacional, conexão Google, renovação/login, pasta Drive, upload/download, faturamento, commit, push, merge ou deploy. Somente fixtures e temporários sintéticos foram usados; sentinelas de fontes privadas e LabState são verificados nos testes.
+
+### 11.1 Evidências finais
+
+| Verificação | Resultado |
+| --- | --- |
+| `npm.cmd run check` | Aprovado: sintaxe válida em **29 arquivos**. |
+| `npm.cmd test` | **547/547 aprovados: 484 anteriores + 63 novos**, zero falhas, cancelados, skips ou TODOs. |
+| `npm.cmd run drive:lab-prepare` | DRY_RUN, effects=NONE, googleContacted=false, publicationChanged=false. |
+| Preview com `-- --dry-run` | Mesmo resultado seguro, sem leitura de fontes reais. |
+| `git diff --check` | Aprovado; apenas avisos de conversão LF/CRLF da configuração Git existente. |
+| `git status --short --branch` | Mesma branch/HEAD; somente os dois novos e três modificados autorizados; nada staged. |
+| P21 e testes históricos de preservação | 67 arquivos protegidos de d2ec6bb, módulos existentes e testes anteriores intactos. |
+| Auditoria de package.json | Scripts anteriores, dependências e demais campos preservados; somente um script novo. |
+| Windows/NTFS real | Tipo NTFS confirmado; hardlinks temporários comprovados no filesystem, sem rede. |
+
+Resumo do runner final:
+
+```text
+tests 547
+pass 547
+fail 0
+cancelled 0
+skipped 0
+todo 0
+duration_ms 186981.6028
+```
+
+| Testes | Evidência |
+| --- | --- |
+| P01–P03 | Preview sem efeitos, parse estrito, dez campos, entropia nos tamanhos exigidos e vínculos privados corretos. |
+| P04–P07 | Menor dos três prazos, margem mínima, identidade inválida/vencida, divergências de cliente/conta/autorização e recusa de schema/scope ampliados. |
+| P08–P12 | Nenhuma consulta/renovação, confirmação/runtime, concorrência em memória, ausência de vazamentos, consumo simulado único e plataforma não suportada recusada. |
+| P13 | Pipeline com leitores privados reais sobre fixtures: arquivo final com nlink=1; durante a publicação ambos os nomes têm nlink=2 e o leitor existente os recusa. Fontes e LabState preservados. |
+| P14–P17 | Lock exclusivo entre processos, diretórios sobrepostos, caminhos inseguros, junction/hardlink, estado ocupado, órfãos, destino existente e recusa de sobrescrita. |
+| P18–P20 | Falhas de write/sync/link/limpeza, colisão, incerteza antes/depois de remover temporário, ACL antes dos bytes e mudanças após hardlink preservam evidências e bloqueiam novas tentativas. |
+| P21 | Integridade dos arquivos protegidos e ausência de chamadas online, renovação ou rename no preparador. |
+
+O teste P13 rodou em Windows/NTFS local e confirmou inode/device iguais e exatamente dois links na janela intermediária. `readPrivateJson()` rejeitou esse destino com `HARDLINK_FILE_FORBIDDEN`; após remoção do temporário, a mesma aprovação foi lida e validada com link único. P18 exercitou a falta de suporte a hardlink e não houve fallback ou retry. Também demonstrou a limitação documentada: depois de uma limpeza efetivada, o destino pode ser válido enquanto o resultado do preparador permanece incerto e exige revisão humana.
+
+As execuções usam o ambiente local já autorizado para ACLs privadas fora da sandbox, sem enfraquecer controles ou editar expectativas anteriores. Testes de ACL aberta usam somente fixtures deliberadamente inseguras para comprovar recusa; nenhum diretório real foi alterado. Os temporários ficam sob prefixo próprio e teardown confere raiz e prefixo antes da remoção. Os servidores HTTP das suítes históricas são apenas loopback de teste, sem autenticação Google real.
+
+### 11.2 Auditoria e aceite pendente
+
+Auditoria de escopo confirmou exatamente cinco arquivos autorizados. A varredura textual de padrões em arquivos rastreados e novos não identificou segredos; valores explicitamente sintéticos foram classificados sem impressão. Os seis binários existentes foram excluídos dessa inspeção de conteúdo, e sua integridade é verificada separadamente por checksum. Não houve leitura de diretórios privados reais ou de arquivos ignorados em busca de credenciais. Padrões textuais não comprovam ausência universal de segredos, nem cobrem dados externos, histórico completo ou backups.
+
+O resultado desta entrega é código e evidência de testes locais. **Aprovação operacional real não foi gerada, LabState real não foi lido/modificado e pasta Drive não foi criada.** Não houve execução CLI com dados privados reais, acesso Google, upload/download, alteração de permissões na nuvem, atualização de dependências ou commit.
+
+**Aguardando validação final do responsável:** revisão do inventário, testes, publicação NTFS, margem de validade e limitações. A preparação real futura exige autorização específica de leitura/gravação local e condições da seção 10.6. A autorização já informada para uma pasta futura continua separada e não foi executada. Preparação offline não comprova ausência de revogação remota e não substitui identidade e permissões no momento da criação.
