@@ -6,11 +6,18 @@
 const $ = (selector) => document.querySelector(selector);
 
 const RSVP_BASE_URL =
-  "https://script.google.com/macros/s/AKfycbwhdgcuee-ndezFAR6mOJJ0yHbXDEI2_oRdsM2OEtLjoPj3gIbX_loq3_YpGE02tKfA/exec";
+  "https://script.google.com/macros/s/AKfycbwZfc6SXPQkpe68CPw5mmvVa6uZnoL80yY2gBzpI_gL9Z9wp8XLGZ0dpvFTxochCukv/exec";
 
 const params = new URLSearchParams(window.location.search);
 const inviteToken = (params.get("token") || "").trim();
 const returnedConfirmed = params.get("confirmado") === "1";
+
+// Mantém o contexto do convite na navegação local, sem autenticar a futura galeria.
+const liveParams = new URLSearchParams();
+if (inviteToken) liveParams.set("token", inviteToken);
+if (returnedConfirmed && inviteToken) liveParams.set("confirmado", "1");
+const liveQuery = liveParams.toString();
+$("#liveExperienceLink").href = `./live-experience/${liveQuery ? `?${liveQuery}` : ""}`;
 
 const boot = $("#boot");
 const app = $("#app");
@@ -72,6 +79,13 @@ let progress = 0;
 let bootTimer = null;
 
 function startBoot() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    progressBar.style.width = "100%";
+    progressText.textContent = "100%";
+    enterBtn.classList.remove("hidden");
+    return;
+  }
+
   bootTimer = window.setInterval(() => {
     progress += Math.floor(Math.random() * 9) + 5;
 
@@ -102,7 +116,7 @@ if (returnedConfirmed || window.location.hash) {
   startBoot();
 }
 
-const eventDate = new Date("2026-11-15T20:00:00-03:00").getTime();
+const eventDate = new Date("2026-11-28T21:00:00-03:00").getTime();
 
 function updateCountdown() {
   let distance = eventDate - Date.now();
