@@ -34,7 +34,7 @@
 
   <link
     rel="apple-touch-icon"
-    href="assets/icon-level-xviii-192.png"
+    href="assets/icon-level-xviii-apple-180.png"
   >
 
   <link
@@ -56,6 +56,11 @@
   <link
     rel="stylesheet"
     href="styles.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="mobile-v8.css"
   >
 </head>
 
@@ -125,6 +130,17 @@
     <!-- =====================================
          ABERTURA / FOTOGRAFIA OFICIAL
          ===================================== -->
+
+    <!-- Navegacao mobile: visivel na abertura, sem cortar a fotografia. -->
+    <a
+      id="mobileContinue"
+      class="mobile-continue"
+      href="#story"
+      aria-label="Continuar convite para a historia"
+    >
+      <span>CONTINUAR CONVITE</span>
+      <span class="mobile-continue-arrow" aria-hidden="true">↓</span>
+    </a>
 
     <section class="hero" aria-labelledby="heroTitle">
 
@@ -524,6 +540,7 @@
 
 
   <script src="app.js"></script>
+  <script src="mobile-v8.js"></script>
 
 </body>
 
