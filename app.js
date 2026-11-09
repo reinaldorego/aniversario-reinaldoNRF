@@ -6,7 +6,7 @@
 const $ = (selector) => document.querySelector(selector);
 
 const RSVP_BASE_URL =
-  "https://script.google.com/macros/s/AKfycbwhdgcuee-ndezFAR6mOJJ0yHbXDEI2_oRdsM2OEtLjoPj3gIbX_loq3_YpGE02tKfA/exec";
+  "https://script.google.com/macros/s/AKfycbwZfc6SXPQkpe68CPw5mmvVa6uZnoL80yY2gBzpI_gL9Z9wp8XLGZ0dpvFTxochCukv/exec";
 
 const params = new URLSearchParams(window.location.search);
 const inviteToken = (params.get("token") || "").trim();
