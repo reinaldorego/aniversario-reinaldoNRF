@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070706">
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="REINALDO 18 — LIVE EXPERIENCE. Os registros oficiais da festa pelo celular.">
+  <title>LIVE EXPERIENCE — Reinaldo 18</title>
+  <link rel="icon" href="../assets/icon-level-xviii.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="live-page">
+  <main class="live-shell">
+    <header class="live-header">
+      <p class="live-brand">LEVEL XVIII <span aria-hidden="true">//</span> REINALDO 18</p>
+      <div class="live-monogram" aria-hidden="true">18</div>
+      <p class="live-kicker">LIVE EXPERIENCE</p>
+      <h1>Momentos<br>ao vivo.</h1>
+      <p class="live-intro">Uma noite especial. Memórias para guardar.</p>
+    </header>
+
+
+    <section id="gallery" class="gallery" aria-labelledby="galleryTitle" aria-busy="false" data-state="coming-soon">
+      <div class="gallery-heading">
+        <div>
+          <p class="live-kicker">OS REGISTROS DA NOITE</p>
+          <h2 id="galleryTitle">Em cada imagem,<br>uma lembrança.</h2>
+        </div>
+        <button id="refreshGallery" class="btn btn-outline gallery-refresh" type="button">ATUALIZAR GALERIA</button>
+      </div>
+      <p id="gallerySummary" class="gallery-summary" role="status">Uma noite. Muitas lembranças.</p>
+      <div id="galleryState" class="live-notice" role="status" aria-live="polite" aria-atomic="true">
+        <span id="galleryBadge" class="live-status">EM BREVE</span>
+        <h3 id="stateTitle">A galeria está a caminho.</h3>
+        <p id="stateDescription">Os registros oficiais da festa estarão disponíveis aqui para acompanhar pelo celular e reviver depois.</p>
+      </div>
+      <div id="gallerySkeleton" class="gallery-skeleton" aria-hidden="true" hidden>
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <ul id="photoGrid" class="gallery-grid" aria-label="Imagens da galeria" hidden></ul>
+      <p id="galleryFeedback" class="gallery-feedback" role="status"></p>
+      <button id="loadMore" class="btn btn-outline gallery-more" type="button" hidden>VER MAIS IMAGENS</button>
+      <p id="gallerySync" class="gallery-sync" aria-live="polite">A galeria ainda não foi publicada.</p>
+      <noscript><p class="gallery-feedback">Ative o JavaScript para atualizar a galeria e abrir as imagens.</p></noscript>
+    </section>
+
+    <footer class="live-footer">
+      <p class="live-event">
+        <time datetime="2026-11-28T21:00:00-03:00">Sábado, 28/11/2026 · 21h</time>
+        <span>Edifício Dhahram · Belém/PA</span>
+      </p>
+      <a id="backToInvitation" class="btn btn-outline" href="../#event">VOLTAR AO CONVITE</a>
+      <p class="live-signature">THE NEXT CHAPTER</p>
+    </footer>
+  </main>
+
+  <dialog id="photoViewer" class="photo-viewer" aria-labelledby="viewerTitle" aria-describedby="viewerCaption">
+    <div class="viewer-top">
+      <p id="viewerTitle">Momentos ao vivo</p>
+      <button id="viewerClose" class="viewer-button viewer-close" type="button" aria-label="Fechar imagem" autofocus>×</button>
+    </div>
+    <div id="viewerStage" class="viewer-stage" aria-busy="false">
+      <div id="viewerMedia" class="viewer-media"></div>
+      <div id="viewerMessage" class="viewer-message">
+        <p id="viewerStatus" role="status">Carregando imagem…</p>
+        <button id="viewerRetry" class="viewer-button" type="button" hidden>TENTAR NOVAMENTE</button>
+      </div>
+    </div>
+    <p id="viewerCaption" class="viewer-caption"></p>
+    <div class="viewer-nav">
+      <button id="viewerPrevious" class="viewer-button" type="button" aria-label="Imagem anterior">← Anterior</button>
+      <span id="viewerPosition" aria-live="polite"></span>
+      <button id="viewerNext" class="viewer-button" type="button" aria-label="Próxima imagem">Próxima →</button>
+    </div>
+    <p class="viewer-help">Use ← e → para navegar. Esc para fechar.</p>
+  </dialog>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

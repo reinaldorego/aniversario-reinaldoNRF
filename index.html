@@ -28,12 +28,13 @@
 
   <link
     rel="icon"
-    href="assets/icon-192.png"
+    href="assets/icon-level-xviii.svg"
+    type="image/svg+xml"
   >
 
   <link
     rel="apple-touch-icon"
-    href="assets/icon-192.png"
+    href="assets/icon-level-xviii-192.png"
   >
 
   <link
@@ -122,30 +123,54 @@
 
 
     <!-- =====================================
-         ARTE PRINCIPAL
+         ABERTURA / FOTOGRAFIA OFICIAL
          ===================================== -->
 
-    <section class="hero hero-poster">
+    <section class="hero" aria-labelledby="heroTitle">
 
-      <img
-        src="assets/hero.png"
-        alt="Convite LEVEL XVIII — Reinaldo NR Filho"
-        class="poster-image"
-      >
+      <div class="hero-visual">
+        <img
+          src="assets/reinaldo-oficial.jpeg"
+          alt="Reinaldo de óculos e camisa clara, em um cenário externo à beira d’água"
+          class="hero-photo"
+          width="1122"
+          height="1402"
+          fetchpriority="high"
+        >
+        <p class="hero-edition">
+          LEVEL XVIII <span>THE NEXT CHAPTER</span>
+        </p>
+      </div>
 
-      <a
-        href="#mission"
-        class="poster-rsvp-hit"
-        aria-label="Ir para confirmação de presença"
-      ></a>
+      <div class="hero-content">
+        <p class="hero-kicker">UMA NOVA FASE COMEÇA AQUI</p>
+        <h1 id="heroTitle">
+          <span>REINALDO</span>
+          <span class="hero-surname">NR FILHO</span>
+        </h1>
+        <p class="hero-tagline">18 anos. Infinitas possibilidades.</p>
 
-      <a
-        href="#story"
-        class="poster-next"
-        aria-label="Continuar convite"
-      >
-        ↓
-      </a>
+        <div class="hero-details">
+          <time datetime="2026-11-28T21:00:00-03:00">
+            <span>SÁBADO</span>
+            <strong>28 NOV 2026</strong>
+          </time>
+          <div>
+            <span>HORÁRIO DE BELÉM</span>
+            <strong>21h</strong>
+          </div>
+        </div>
+
+        <p class="hero-location">
+          Salão de festas do Edifício Dhahram
+          <span>Travessa Vileta, 1197 · Belém/PA</span>
+        </p>
+
+        <a class="btn btn-gold hero-rsvp" href="#mission">CONFIRMAR PRESENÇA</a>
+        <a class="hero-next" href="#story">
+          CONTINUAR CONVITE <span aria-hidden="true">↓</span>
+        </a>
+      </div>
 
     </section>
 
@@ -220,11 +245,11 @@
           </span>
 
           <strong>
-            15 NOV
+            28 NOV
           </strong>
 
           <small>
-            2026 · Domingo
+            2026 · Sábado
           </small>
 
         </article>
@@ -237,7 +262,7 @@
           </span>
 
           <strong>
-            20:00
+            21:00
           </strong>
 
           <small>
@@ -264,21 +289,29 @@
         </article>
 
 
-        <article class="card">
+        <a
+          id="liveExperienceLink"
+          class="card card-link"
+          href="./live-experience/"
+        >
 
           <span>
-            ACOMPANHANTES
+            LIVE EXPERIENCE
           </span>
 
           <strong>
-            Até 3
+            Momentos ao vivo
           </strong>
 
           <small>
-            Por convite confirmado
+            Acompanhe os registros da festa pelo celular
           </small>
 
-        </article>
+          <small class="card-status">
+            Em breve →
+          </small>
+
+        </a>
 
       </div>
 
@@ -328,10 +361,7 @@
       </p>
 
       <p class="deadline">
-        Confirme até
-        <strong>
-          01 de novembro de 2026
-        </strong>
+        Confirme sua presença
       </p>
 
       <button
