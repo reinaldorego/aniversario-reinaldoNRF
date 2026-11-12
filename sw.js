@@ -1,6 +1,6 @@
-/* LEVEL XVIII — Service Worker v10 (seta superior Mobile V8.2). Sem cache de tokens ou dados privados. */
+/* LEVEL XVIII — Service Worker v11 (horário e monograma atualizados). Sem cache de tokens ou dados privados. */
 
-const CACHE_NAME = "level-xviii-v10";
+const CACHE_NAME = "level-xviii-v11";
 const INVITATION_CACHE_PATTERN = /^level-xviii-v\d+$/;
 
 const FILES_TO_CACHE = [

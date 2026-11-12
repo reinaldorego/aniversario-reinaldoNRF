@@ -116,7 +116,7 @@ if (returnedConfirmed || window.location.hash) {
   startBoot();
 }
 
-const eventDate = new Date("2026-11-28T21:00:00-03:00").getTime();
+const eventDate = new Date("2026-11-28T20:00:00-03:00").getTime();
 
 function updateCountdown() {
   let distance = eventDate - Date.now();
