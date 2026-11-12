@@ -1,6 +1,6 @@
-/* LEVEL XVIII — Service Worker v11 (horário e monograma atualizados). Sem cache de tokens ou dados privados. */
+/* LEVEL XVIII — Service Worker v12 (animações cinematográficas). Sem cache de tokens ou dados privados. */
 
-const CACHE_NAME = "level-xviii-v11";
+const CACHE_NAME = "level-xviii-v12";
 const INVITATION_CACHE_PATTERN = /^level-xviii-v\d+$/;
 
 const FILES_TO_CACHE = [
@@ -9,6 +9,8 @@ const FILES_TO_CACHE = [
   "./styles.css",
   "./mobile-v8.css",
   "./app.js",
+  "./cinematic-motion.css",
+  "./cinematic-motion.js",
   "./mobile-v8.js",
   "./manifest.webmanifest",
   "./assets/reinaldo-oficial.jpeg",
