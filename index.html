@@ -55,7 +55,7 @@
 
   <link
     rel="stylesheet"
-    href="styles.css"
+    href="styles.css?v=17"
   >
 </head>
 
@@ -143,21 +143,23 @@
       </div>
 
       <div class="hero-content">
-        <p class="hero-kicker">UMA NOVA FASE COMEÇA AQUI</p>
-        <h1 id="heroTitle">
-          <span>REINALDO</span>
-          <span class="hero-surname">NR FILHO</span>
-        </h1>
-        <p class="hero-tagline">18 anos. Infinitas possibilidades.</p>
+        <div class="hero-heading">
+          <p class="hero-kicker">UMA NOVA FASE COMEÇA AQUI</p>
+          <h1 id="heroTitle">
+            <span>REINALDO</span>
+            <span class="hero-surname">NR FILHO</span>
+          </h1>
+          <p class="hero-tagline">18 anos. Infinitas possibilidades.</p>
+        </div>
 
         <div class="hero-details">
-          <time datetime="2026-11-28T21:00:00-03:00">
+          <time datetime="2026-11-28T20:00:00-03:00">
             <span>SÁBADO</span>
             <strong>28 NOV 2026</strong>
           </time>
           <div>
             <span>HORÁRIO DE BELÉM</span>
-            <strong>21h</strong>
+            <strong>20h</strong>
           </div>
         </div>
 
@@ -170,19 +172,6 @@
         <a class="hero-next" href="#story">
           CONTINUAR CONVITE <span aria-hidden="true">↓</span>
         </a>
-
-        <div class="invitation-music" role="group" aria-label="Trilha sonora do convite">
-          <audio id="invitationAudio" preload="none" src="assets/audio/horizon-diamond-tunes.mp3?v=b3299040c0dd8eca81babe0c3fb5400e720fd88eda24c4000eb8f1b8d1a3da2f"></audio>
-          <button id="musicToggle" class="music-toggle hidden" type="button" aria-controls="invitationAudio">
-            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
-              <path d="M3 9v6h4l5 4V5L7 9H3z" fill="currentColor"></path>
-              <path id="musicOnIcon" d="M15 9a4 4 0 0 1 0 6M17.5 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
-              <path id="musicOffIcon" class="hidden" d="M16 9l5 6m0-6l-5 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
-            </svg>
-            <span id="musicLabel" class="music-label">Reproduzir música</span>
-          </button>
-          <p id="musicStatus" class="music-status" role="status" aria-live="polite"></p>
-        </div>
       </div>
 
     </section>
@@ -275,7 +264,7 @@
           </span>
 
           <strong>
-            21:00
+            20:00
           </strong>
 
           <small>
@@ -321,7 +310,7 @@
           </small>
 
           <small class="card-status">
-            Em breve →
+            Abrir galeria →
           </small>
 
         </a>
@@ -349,6 +338,18 @@
 
     </section>
 
+
+    <section id="live-gallery" class="section cloud-gallery" aria-labelledby="liveGalleryTitle" hidden>
+      <p class="section-kicker">LIVE EXPERIENCE</p>
+      <h2 id="liveGalleryTitle">Momentos ao vivo.</h2>
+      <p class="cloud-gallery-status" data-gallery-status role="status">Carregando a galeria…</p>
+      <div class="cloud-gallery-actions">
+        <a class="btn btn-outline" data-gallery-link target="_blank" rel="noopener noreferrer" hidden>ABRIR GALERIA EM OUTRA ABA</a>
+        <button class="btn btn-outline" data-gallery-retry type="button" hidden>TENTAR NOVAMENTE</button>
+      </div>
+      <div class="cloud-gallery-frame" data-gallery-frame></div>
+      <a class="btn btn-outline cloud-gallery-return" href="#event">VOLTAR AOS DETALHES DA FESTA</a>
+    </section>
 
     <!-- =====================================
          MISSÃO / RSVP
@@ -516,7 +517,7 @@
     >
 
       <div class="monogram">
-        NR
+        R.N.R.F
       </div>
 
       <h2>
@@ -533,11 +534,25 @@
 
     </section>
 
+    <div class="invitation-music" role="group" aria-label="Trilha sonora do convite">
+      <audio id="invitationAudio" preload="none" loop src="assets/audio/horizon-diamond-tunes.mp3?v=b3299040c0dd8eca81babe0c3fb5400e720fd88eda24c4000eb8f1b8d1a3da2f"></audio>
+      <button id="musicToggle" class="music-toggle hidden" type="button" aria-controls="invitationAudio">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+          <path d="M3 9v6h4l5 4V5L7 9H3z" fill="currentColor"></path>
+          <path id="musicOnIcon" class="hidden" d="M15 9a4 4 0 0 1 0 6M17.5 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
+          <path id="musicOffIcon" d="M16 9l5 6m0-6l-5 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
+        </svg>
+        <span id="musicLabel" class="music-label">Reproduzir música</span>
+      </button>
+      <p id="musicStatus" class="music-status" role="status" aria-live="polite"></p>
+    </div>
+
   </main>
 
 
-  <script src="app.js"></script>
-  <script src="invitation-audio.js"></script>
+  <script src="app.js?v=17"></script>
+  <script src="invitation-audio.js?v=17"></script>
+  <script type="module" src="live-experience/invitation-gallery.js?v=17"></script>
 
 </body>
 

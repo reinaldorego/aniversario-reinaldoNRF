@@ -116,7 +116,7 @@ if (returnedConfirmed || window.location.hash) {
   startBoot();
 }
 
-const eventDate = new Date("2026-11-28T21:00:00-03:00").getTime();
+const eventDate = Date.parse($(".hero-details time").dateTime);
 
 function updateCountdown() {
   let distance = eventDate - Date.now();
@@ -156,12 +156,26 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// Mantém o deslocamento sutil da foto usado na prévia cinematográfica.
+// A foto acompanha a rolagem. O nome entra quando fica visível.
 (() => {
   const hero = document.querySelector(".hero-visual");
+  const heading = document.querySelector(".hero-heading");
   if (!hero || !window.matchMedia || !window.requestAnimationFrame) return;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let pending = false;
+
+  if (heading && "IntersectionObserver" in window && !reducedMotion.matches) {
+    heading.classList.add("hero-heading-pending");
+    const entrance = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting || entry.intersectionRatio < 0.2) return;
+      entrance.disconnect();
+      heading.classList.remove("hero-heading-pending");
+      if (!reducedMotion.matches) heading.classList.add("hero-heading-entrance");
+    }, { threshold: 0.2 });
+    entrance.observe(heading);
+  } else if (heading && !reducedMotion.matches) {
+    heading.classList.add("hero-heading-entrance");
+  }
 
   function updateParallax() {
     pending = false;
@@ -170,9 +184,9 @@ if ("serviceWorker" in navigator) {
       return;
     }
     const rect = hero.getBoundingClientRect();
-    if (rect.bottom < 0 || rect.top > window.innerHeight) return;
-    const distance = Math.max(0, Math.min(-rect.top, rect.height));
-    hero.style.setProperty("--hero-motion", `${Math.min(distance * 0.12, 30).toFixed(2)}px`);
+    if (rect.height <= 0 || rect.bottom < 0 || rect.top > window.innerHeight) return;
+    const distance = Math.max(0, -rect.top);
+    hero.style.setProperty("--hero-motion", `${(distance * 0.32).toFixed(2)}px`);
   }
 
   function scheduleParallax() {

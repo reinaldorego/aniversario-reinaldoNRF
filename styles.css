@@ -399,9 +399,21 @@
     }
 
     .hero-photo {
-      transform: scale(1.05) translate3d(0, var(--hero-motion, 0px), 0);
-      transform-origin: center center;
+      transform: translate3d(0, var(--hero-motion, 0px), 0);
       filter: saturate(0.95) contrast(1.04);
+    }
+
+    .hero-heading-pending {
+      opacity: 0;
+    }
+
+    .hero-heading-entrance {
+      animation: hero-entrance 1.8s cubic-bezier(.22, .7, .18, 1) both;
+    }
+
+    @keyframes hero-entrance {
+      from { opacity: 0; transform: translateY(58px) scale(.97); }
+      to { opacity: 1; transform: none; }
     }
   }
 
@@ -1092,6 +1104,52 @@
   
   }
   
+  .cloud-gallery {
+    min-width: 0;
+  }
+
+  .cloud-gallery[hidden],
+  .cloud-gallery [hidden] {
+    display: none !important;
+  }
+
+  .cloud-gallery-status {
+    margin: 16px 0;
+    color: var(--muted);
+  }
+
+  .cloud-gallery-status:empty {
+    display: none;
+  }
+
+  .cloud-gallery-actions {
+    display: grid;
+    gap: 12px;
+  }
+
+  .cloud-gallery-return {
+    margin-top: 24px;
+  }
+
+  .cloud-gallery-frame {
+    position: relative;
+  }
+
+  .cloud-gallery-frame iframe {
+    position: absolute;
+    visibility: hidden;
+    width: 100%;
+    height: 0;
+    border: 0;
+  }
+
+  .cloud-gallery-frame iframe.gallery-frame-ready {
+    position: static;
+    visibility: visible;
+    display: block;
+    margin-top: 20px;
+  }
+
   .monogram {
   
     margin-bottom: 20px;
@@ -1109,6 +1167,41 @@
   
   }
   
+  @media (prefers-reduced-motion: no-preference) {
+    .closing .monogram {
+      display: inline-block;
+      padding: 0.15em 0.3em;
+      animation: closing-glow 5s ease-in-out infinite;
+    }
+
+    @supports (background-clip: text) or (-webkit-background-clip: text) {
+      .closing .monogram {
+        color: transparent;
+        background: linear-gradient(105deg, #a87916 5%, #f2d780 30%, #fff8cf 49%, #e1bd58 65%, #a87916 95%);
+        background-size: 220% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        animation-name: closing-glow, closing-reflection;
+      }
+    }
+
+    @keyframes closing-reflection {
+      0%, 100% { background-position: 100% 50%; }
+      50% { background-position: 0% 50%; }
+    }
+
+    @keyframes closing-glow {
+      0%, 100% {
+        transform: perspective(600px) rotateY(-23deg) rotateX(4deg) scale(0.98);
+        filter: drop-shadow(2px 3px 0 #805815) drop-shadow(0 0 7px #d4af3766);
+      }
+      50% {
+        transform: perspective(600px) rotateY(23deg) rotateX(-3deg) scale(1.1);
+        filter: drop-shadow(3px 5px 0 #805815) drop-shadow(0 0 18px #f8d675cc);
+      }
+    }
+  }
+
   .closing p {
   
     margin:

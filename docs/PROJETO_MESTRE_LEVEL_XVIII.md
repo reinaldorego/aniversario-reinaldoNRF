@@ -32,7 +32,7 @@ Transformar o convite digital interativo **LEVEL XVIII** em uma experiência con
 | Aniversariante | Reinaldo NR Filho | Confirmado |
 | Comemoração | 18 anos | Confirmado |
 | **Data da festa** | **28/11/2026 (sábado)** | **Novo dado definitivo** |
-| **Início** | **21h, horário de Belém (UTC−03:00)** | **Novo dado definitivo** |
+| **Início** | **20h, horário de Belém (UTC−03:00)** | **Confirmado pelo responsável em 22/11/2026** |
 | Local | Salão de festas do Edifício Dhahram | Confirmado |
 | Endereço | Travessa Vileta, nº 1197 — Belém/PA | Confirmado |
 | Identidade | Dark Cinematic / Black & Gold Tech | Aprovado |
@@ -80,7 +80,7 @@ Transformar o convite digital interativo **LEVEL XVIII** em uma experiência con
 ### RF-01 — Convite digital
 
 - Exibir identidade cinematográfica LEVEL XVIII e a nova foto do aniversariante sem alterar seus traços faciais.
-- Atualizar textos, data e horário para **28/11/2026 às 21h**.
+- Atualizar textos, data e horário para **28/11/2026 às 20h**.
 - Atualizar contador regressivo no fuso `America/Belem` / UTC−03:00, sem depender do fuso do visitante.
 - Exibir local e abrir rota/localização em aplicativo de mapa.
 - Evitar informações obsoletas incorporadas ao próprio arquivo de imagem (data, horário, dia da semana, botão não clicável).
@@ -237,7 +237,7 @@ Essa árvore é uma **proposta**, não uma declaração dos arquivos existentes.
 
 ### CA-01 — Convite
 
-- [ ] Mostra 28/11/2026 (sábado), às 21h, no texto **e** nas imagens que apresentarem informações.
+- [ ] Mostra 28/11/2026 (sábado), às 20h, no texto **e** nas imagens que apresentarem informações.
 - [ ] Foto nova aprovada, sem alteração de identidade facial.
 - [ ] Card de acompanhantes substituído por LIVE EXPERIENCE.
 - [ ] Responsividade validada no celular e no desktop.
@@ -269,7 +269,7 @@ Essa árvore é uma **proposta**, não uma declaração dos arquivos existentes.
 
 1. **M0 — Auditoria e preservação:** inspecionar `git status`, branch, estrutura, versões e implantações; confirmar backup; inventariar fluxos sem modificar código.
 2. **M1 — Documentação:** reconciliar este Documento Mestre com o repositório; criar estado atual, arquitetura proposta, riscos e plano com aprovação humana.
-3. **M2 — Atualizar convite:** nova foto, informações 28/11 21h, corrigir arte e countdown, trocar card; rodar testes de regressão RSVP/QR/check-in.
+3. **M2 — Atualizar convite:** nova foto, informações 28/11 20h, corrigir arte e countdown, trocar card; rodar testes de regressão RSVP/QR/check-in.
 4. **M3 — Galeria estática de demonstração:** layout funcional com dados de teste explicitamente identificados, sem credenciais e sem alterar produção.
 5. **M4 — Autenticação e integração com Drive:** restringir publicação a dois perfis, implementar acesso às fotos publicadas, carregamento incremental e recuperação de erros.
 6. **M5 — Homologação no celular:** testes de acesso convidados, autorização de publicação, rede lenta, rotas, cache/PWA, segurança e privacidade.

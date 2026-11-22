@@ -1,4 +1,4 @@
-/* Inicia após gesto explícito do convidado na entrada ou no controle de áudio. */
+/* O controle acompanha a reprodução e guarda a escolha enquanto a aba estiver aberta. */
 (() => {
   const audio = document.getElementById("invitationAudio");
   const button = document.getElementById("musicToggle");
@@ -8,8 +8,34 @@
   const status = document.getElementById("musicStatus");
   if (!audio || !button || !label || !soundOnIcon || !soundOffIcon || !status) return;
 
+  const enterButton = document.getElementById("enterBtn");
+  const bootScreen = document.getElementById("boot");
+  const storageKey = "level-xviii:music";
+  const loadingMessage = "Carregando a música…";
+  const resumeMessage = "Toque no alto-falante para continuar a música.";
+  let preference;
   let playRequest = 0;
   let positionFrame = 0;
+
+  function savePreference(value = preference) {
+    preference = value;
+    if (!value) return;
+    try {
+      sessionStorage.setItem(storageKey, JSON.stringify({ value, time: audio.currentTime }));
+    } catch { /* A música continua disponível sem armazenamento. */ }
+  }
+
+  function restorePreference() {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(storageKey));
+      if (saved?.value !== "playing" && saved?.value !== "paused") return;
+      preference = saved.value;
+      if (preference === "paused" && !audio.paused) audio.pause();
+      if (audio.paused && Number.isFinite(saved.time) && saved.time >= 0) {
+        audio.currentTime = saved.time;
+      }
+    } catch { /* A preferência é opcional. */ }
+  }
 
   function schedulePosition() {
     if (positionFrame) return;
@@ -59,9 +85,9 @@
     soundOffIcon.classList.toggle("hidden", playing);
   }
 
-  function playFromGesture() {
+  function playAudio(failureMessage = "Não foi possível reproduzir. Toque para tentar novamente.") {
     const request = ++playRequest;
-    setStatus("Carregando a música…");
+    setStatus(loadingMessage);
     try {
       if (audio.error) audio.load();
       else if (audio.ended) audio.currentTime = 0;
@@ -76,14 +102,14 @@
         () => {
           if (request !== playRequest) return;
           if (!audio.paused) audio.pause();
-          setStatus("Não foi possível reproduzir. Toque para tentar novamente.");
+          setStatus(failureMessage);
           syncButton();
         }
       );
     } catch {
       if (request !== playRequest) return;
       if (!audio.paused) audio.pause();
-      setStatus("Não foi possível reproduzir. Toque para tentar novamente.");
+      setStatus(failureMessage);
       syncButton();
     }
   }
@@ -92,18 +118,19 @@
     if (!audio.paused) {
       ++playRequest;
       audio.pause();
+      savePreference("paused");
       setStatus("");
       syncButton();
       return;
     }
 
-    playFromGesture();
+    savePreference("playing");
+    playAudio();
   });
 
   audio.addEventListener("play", syncButton);
   audio.addEventListener("pause", () => {
-    ++playRequest;
-    if (status.textContent === "Carregando a música…") setStatus("");
+    if (audio.paused && status.textContent === loadingMessage) setStatus("");
     syncButton();
   });
   audio.addEventListener("ended", () => {
@@ -118,12 +145,30 @@
     syncButton();
   });
 
-  syncButton();
+  function resumeIfAllowed() {
+    const invitationIsOpen = !bootScreen || bootScreen.classList.contains("hidden");
+    if (invitationIsOpen && preference === "playing" && audio.paused) playAudio(resumeMessage);
+    syncButton();
+  }
+
+  restorePreference();
+  resumeIfAllowed();
   button.classList.remove("hidden");
   window.addEventListener("scroll", schedulePosition, { passive: true });
   window.addEventListener("resize", schedulePosition);
-  document.getElementById("enterBtn")?.addEventListener("click", () => {
-    if (audio.paused) playFromGesture();
+  window.addEventListener("pagehide", () => savePreference());
+  window.addEventListener("pageshow", event => {
+    if (event.persisted) {
+      restorePreference();
+      resumeIfAllowed();
+      schedulePosition();
+    }
+  });
+  enterButton?.addEventListener("click", () => {
+    if (audio.paused && preference !== "paused") {
+      savePreference("playing");
+      playAudio();
+    }
     schedulePosition();
   }, { capture: true });
   schedulePosition();

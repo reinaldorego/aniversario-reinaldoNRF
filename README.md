@@ -3,7 +3,7 @@
 ## Dados
 - Reinaldo NR Filho
 - 18 anos
-- 28/11/2026 (sábado), às 21h (Belém/PA)
+- 28/11/2026 (sábado), às 20h (Belém/PA)
 - Ed. Dhahram
 - Trav. Vileta, 1197
 - Até 3 acompanhantes
@@ -27,7 +27,7 @@ Depois acesse:
 - Música: **Horizon**, de **Diamond_Tunes**, obtida no Pixabay.
 - Arquivo de origem confirmado: `diamond_tunes-horizon-369951.mp3`, SHA-256 `b3299040c0dd8eca81babe0c3fb5400e720fd88eda24c4000eb8f1b8d1a3da2f`.
 - Asset local: `assets/audio/horizon-diamond-tunes.mp3`. A URL do convite inclui o hash para evitar a versão anterior no cache do navegador.
-- O áudio tenta começar no toque em **ENTRAR NA EXPERIÊNCIA**. Se o navegador bloquear a tentativa, o botão permite iniciar; durante a reprodução, ele pausa e retoma por toque. O service worker atualiza a versão dos arquivos da página; o MP3 permanece fora do pré-cache e é carregado sob demanda.
+- O áudio tenta começar no toque em **ENTRAR NA EXPERIÊNCIA**. O convite e a galeria integrada compartilham a mesma reprodução. O botão pausa ou retoma por toque. Na mesma aba, o convite e a galeria guardam a posição da faixa e a escolha de pausar. Se o navegador bloquear a retomada, o alto-falante permite continuar. O MP3 é carregado sob demanda.
 
 ## Estado desta versão
 - Layout responsivo

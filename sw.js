@@ -1,14 +1,17 @@
 /* LEVEL XVIII — cache dos arquivos públicos do convite e da galeria. */
 
-const CACHE_NAME = "level-xviii-v14";
+const CACHE_NAME = "level-xviii-v17";
 const INVITATION_CACHE_PATTERN = /^level-xviii-v\d+$/;
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
   "./styles.css",
+  "./styles.css?v=17",
   "./app.js",
+  "./app.js?v=17",
   "./invitation-audio.js",
+  "./invitation-audio.js?v=17",
   // O MP3 versionado é buscado somente após toque, fora do pré-cache.
   "./manifest.webmanifest",
   "./assets/reinaldo-oficial.jpeg",
@@ -19,7 +22,10 @@ const FILES_TO_CACHE = [
   "./live-experience/index.html",
   "./live-experience/styles.css",
   "./live-experience/app.js",
+  "./live-experience/app.js?v=17",
   "./live-experience/navigation.js",
+  "./live-experience/invitation-gallery.js?v=17",
+  "./live-experience/gallery-embed.js?v=17",
   "./live-experience/data-source.js",
   "./live-experience/gallery.js"
 ];
