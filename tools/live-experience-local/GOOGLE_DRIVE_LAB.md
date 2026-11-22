@@ -617,3 +617,89 @@ Resultado desta etapa: implementação e testes locais concluídos, aguardando v
 foi alterado; nenhuma chamada Google ou criação remota foi realizada.** Não houve alteração de escopo,
 dependências, motor de criação/publicação, frontend, RSVP, QR, Access Pass, check-in ou Service Worker.
 Não houve commit, push, merge ou deploy. O diagnóstico operacional exige autorização posterior.
+
+## 14. Preflight Google Drive somente de leitura
+
+O comando independente `drive:lab-preflight` consulta metadados remotos somente quando explicitamente
+autorizado. Não usa o journal/claim, não consome aprovação de criação e não libera criação ou publicação.
+As regras das seções anteriores para `lab-create`, `lab-inspect` e `lab-diagnose` continuam próprias
+daqueles comandos; o preflight não substitui suas aprovações.
+
+### 14.1 Comandos e confirmação
+
+Em `tools/live-experience-local/`, os comandos seguros de preview são:
+
+```powershell
+npm.cmd run drive:lab-preflight
+npm.cmd run drive:lab-preflight -- --dry-run
+```
+
+O dry-run é padrão e precede acesso ao ambiente, arquivos privados, ACL, SDK e rede. Para uma futura
+operação real, a autorização humana específica deve anteceder tanto a flag `--execute` quanto a
+confirmação `LEVEL_DRIVE_LAB_PREFLIGHT_CONFIRMED=true`. A flag isolada não basta. Credenciais Desktop
+e tokens existentes são indicados por `LEVEL_DRIVE_CREDENTIALS_FILE` e `LEVEL_DRIVE_TOKEN_DIR`, em
+caminhos privados externos ao repositório. Não registrar seus valores ou conteúdos no Git/terminal.
+Nesta entrega não se executa a CLI contra o Google nem se configura uma autorização operacional.
+
+### 14.2 Consultas, transporte e saída
+
+Depois de validar caminhos, ACL, cliente, escopo `drive.file`, grant e validade do access token, o
+preflight prevê, nesta ordem, no máximo três consultas de dados, todas GET:
+
+1. `files.get`: metadados de `root`, com `LAB_METADATA_FIELDS`.
+2. `permissions.list`: permissões do ID retornado pela raiz, `pageSize=100`, campos fixos.
+3. `files.list`: busca não recursiva de itens não excluídos com
+   `appProperties.levelXVIIILab=LAB_TAG`, `pageSize=3`, campos fixos.
+
+Não há busca de páginas adicionais. Resposta incompleta, `nextPageToken`, busca incompleta, erro HTTP,
+expiração ou timeout bloqueiam na etapa corrente e impedem consultas seguintes. O limite é de 15 s
+por consulta, com abort; não é um deadline global de 15 s. Retries e redirects ficam desabilitados.
+A guarda de transporte recusa destinos externos, métodos diferentes de GET e `alt=media`.
+
+O interceptor força `redirect='error'`, opção Fetch efetivamente usada no transporte instalado
+(`googleapis` 189.0.0, `gaxios` 8.3.2 e `node-fetch` 3.3.2). A regressão F13 mantém SDK, Gaxios e
+node-fetch reais e substitui somente `http.request`/`https.request` por respostas em memória. Seu
+controle sem a guarda segue um redirect; com o preflight, respostas 301/302/303/307/308 para destino
+externo ou `alt=media` provocam bloqueio após uma única requisição, sem atingir o destino indicado.
+Não basta verificar a presença de uma opção em mocks do SDK; repetir essa regressão ao atualizar dependências.
+
+O token precisa ter mais de seis minutos de validade restante e o grant mais de um minuto. Não há
+renovação automática, persistência de tokens, escrita de estado, criação, upload ou download de mídia.
+Segredo Desktop e refresh token são lidos para validar o envelope existente, mas não são repassados
+ao cliente do preflight; ele recebe somente access token, expiração e tipo. Métodos de refresh são bloqueados.
+
+A saída contém somente campos fixos de modo, etapa, código, escopo e efeitos. Não imprime IDs,
+URLs privadas, credenciais, tokens, hashes ou exceções brutas. Falhas não incluídas na lista pública,
+inclusive redirects e indisponibilidade de caminho privado, viram `VALIDATION_OR_ACCESS_FAILED`.
+`googleContacted=true` indica tentativa de consulta, não prova de que o Google recebeu a requisição.
+`PREFLIGHT_READS_COMPLETED` indica conclusão das leituras, não homologação de conta, ACL remota ou publicação.
+
+### 14.3 Testes offline e limite do sandbox no Windows
+
+Com Node.js 24 e dependências instaladas, executar em `tools/live-experience-local/`, fora do sandbox
+quando este restringir os ancestrais do temporário:
+
+```powershell
+# Suíte completa; remove DEBUG somente da cópia do ambiente destinada ao processo filho.
+node --input-type=module -e "import {spawnSync} from 'node:child_process'; const env={...process.env}; delete env.DEBUG; const result=spawnSync(process.execPath,['--test','test/drive-lab-preflight.test.mjs'],{env,stdio:'inherit'}); process.exit(result.status??1);"
+```
+
+Para executar somente a regressão de redirects, acrescentar `'--test-name-pattern=^F13'` ao array
+de argumentos, entre `'--test'` e o arquivo. Não alterar variáveis globais ou enfraquecer os validadores.
+Outras configurações inseguras de logging/TLS continuam sujeitas às recusas existentes.
+
+No Windows deste ambiente, o F12 isolado falhou dentro do sandbox: `fs.realpath` retornou `EPERM`
+em um ancestral de `TEMP`, antes de verificar a ACL e abrir a fixture de credenciais. A sequência
+foi `PRIVATE_PATH_UNAVAILABLE` na leitura privada e `VALIDATION_OR_ACCESS_FAILED` na etapa `AUTH`.
+Fora do sandbox, o mesmo F12 passou; a suíte anterior à regressão F13 passou 64/64, sem falhas.
+`TEMP`, `TMP` e `os.tmpdir()` coincidiam; não se identificaram links simbólicos nos ancestrais fora
+do sandbox. O bloqueio foi do ambiente de execução, não evidência de ACL incorreta na fixture.
+
+Somente o setup do F12 cria credenciais/tokens sintéticos e aplica ACL privada ao seu novo diretório
+temporário. O teardown verifica diretório/prefixo antes de remover o scratch. Permissões, credenciais
+e configurações existentes ficam preservadas. Os testes verificam mocks, SDK com transporte simulado,
+filesystem local e baselines Git (F11); não demonstram integração real com o Google Drive.
+
+Validação após bloquear redirects: F13 isolado **12/12**, suíte completa **76/76**, zero falhas,
+cancelamentos ou testes ignorados, ambos fora do sandbox e sem `DEBUG` no processo filho. F11 e F12
+passaram; nenhuma chamada Google real foi executada.

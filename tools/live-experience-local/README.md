@@ -10,6 +10,34 @@ O simulador de sincronização continua **inteiramente local e sintético**, iso
 
 Leia [Google Drive OAuth: segurança, comandos e autorização futura](GOOGLE_DRIVE_OAUTH.md) e [validação 04B.3A](VALIDACAO_MARCO_04B_3A.md). A CLI nova não alimenta o motor de publicação, não cria recursos Drive e não modifica as três pastas reais.
 
+## Preflight Google Drive somente de leitura
+
+Em `tools/live-experience-local/`, `npm.cmd run drive:lab-preflight` (ou `-- --dry-run`)
+retorna `DRY_RUN` antes de consultar ambiente, arquivos privados, SDK ou rede. Uma operação real
+exige autorização humana específica, `--execute` e `LEVEL_DRIVE_LAB_PREFLIGHT_CONFIRMED=true`;
+a confirmação não é gerada pelo comando. Credenciais Desktop e tokens devem permanecer em caminhos
+externos privados, configurados por `LEVEL_DRIVE_CREDENTIALS_FILE` e `LEVEL_DRIVE_TOKEN_DIR`.
+
+O preflight prevê três GETs sequenciais: metadados da raiz, permissões da raiz identificada e busca
+limitada de itens com a tag do laboratório. Erro, resposta incompleta, paginação ou timeout bloqueiam
+o avanço. Cada consulta tem limite de 15 s; não há retries, redirects, download de mídia, renovação
+de token ou persistência pelo preflight. O cliente recebe somente access token, expiração e tipo.
+Contrato e limites completos na [seção 14 do laboratório](GOOGLE_DRIVE_LAB.md#14-preflight-google-drive-somente-de-leitura).
+
+Para testar sem mudar o ambiente pai, execute neste diretório, com Node.js 24 e dependências instaladas:
+
+```powershell
+node --input-type=module -e "import {spawnSync} from 'node:child_process'; const env={...process.env}; delete env.DEBUG; const result=spawnSync(process.execPath,['--test','test/drive-lab-preflight.test.mjs'],{env,stdio:'inherit'}); process.exit(result.status??1);"
+```
+
+No Windows deste ambiente, execute essa suíte fora do sandbox, mediante autorização: o F12 falha
+dentro dele com `EPERM` ao resolver um ancestral de `TEMP`, reportado como `VALIDATION_OR_ACCESS_FAILED`
+em `AUTH`. Fora dele, a suíte anterior passou 64/64; com a regressão de redirects, passou
+**76/76, zero falhas**, com `DEBUG` removido somente do processo filho.
+O F12 cria apenas fixtures temporárias sintéticas, aplica ACL privada à própria pasta e limpa o scratch;
+nenhuma permissão existente deve ser afrouxada. A regressão F13 usa SDK/fetch instalados e respostas
+3xx simuladas, sem abrir sockets nem consultar o Google. Testes locais não atestam integração real.
+
 ## Instalar e testar
 
 Requer Node.js **24.x**; validado com v24.21.0 e npm 11.19.0 em Windows, sem atualizar esses programas. O 04B.3A usa somente uma dependência direta, o SDK oficial `googleapis` **189.0.0**, com versões transitivas fixadas em `package-lock.json`. A suíte completa exige instalar essa árvore; os comandos do simulador continuam sem importar o SDK. `package.json` permanece privado.
