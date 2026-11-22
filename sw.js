@@ -1,6 +1,6 @@
 /* LEVEL XVIII — cache dos arquivos públicos do convite e da galeria. */
 
-const CACHE_NAME = "level-xviii-v17";
+const CACHE_NAME = "level-xviii-v18";
 const INVITATION_CACHE_PATTERN = /^level-xviii-v\d+$/;
 
 const FILES_TO_CACHE = [
@@ -21,11 +21,13 @@ const FILES_TO_CACHE = [
   "./live-experience/",
   "./live-experience/index.html",
   "./live-experience/styles.css",
+  "./live-experience/styles.css?v=18",
   "./live-experience/app.js",
-  "./live-experience/app.js?v=17",
+  "./live-experience/app.js?v=18",
   "./live-experience/navigation.js",
-  "./live-experience/invitation-gallery.js?v=17",
-  "./live-experience/gallery-embed.js?v=17",
+  "./live-experience/cloud-source.js?v=18",
+  "./live-experience/gallery.js?v=18",
+  "./live-experience/data-source.js?v=18",
   "./live-experience/data-source.js",
   "./live-experience/gallery.js"
 ];
@@ -57,7 +59,7 @@ self.addEventListener("activate", (event) => {
 async function fetchPage(request, url) {
   try {
     // Prioriza o HTML atual, inclusive quando há token na navegação.
-    return await fetch(request);
+    return await fetch(request, { cache: "no-cache" });
   } catch (error) {
     const cache = await caches.open(CACHE_NAME);
     // O fallback é somente HTML público; não armazena respostas por token.

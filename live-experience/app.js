@@ -1,7 +1,25 @@
-import { mountCloudGallery } from "./gallery-embed.js?v=17";
+import { createCloudSource } from "./cloud-source.js?v=18";
+import { Gallery } from "./gallery.js?v=18";
 import { preserveInvitationContext } from "./navigation.js";
 
 preserveInvitationContext("../");
-const gallery = document.querySelector("#gallery");
-gallery.querySelector("[data-gallery-retry]").addEventListener("click", () => mountCloudGallery(gallery));
-mountCloudGallery(gallery);
+const directLink = document.querySelector("[data-gallery-link]");
+const source = createCloudSource(url => {
+  directLink.href = url.href;
+  directLink.hidden = false;
+});
+const gallery = new Gallery(source);
+gallery.refresh();
+
+const timer = window.setInterval(() => {
+  if (!document.hidden && !gallery.elements.photoViewer.open && !gallery.elements.refreshGallery.disabled) {
+    gallery.refresh();
+  }
+}, 65000);
+
+window.addEventListener("pagehide", event => {
+  if (event.persisted) return;
+  window.clearInterval(timer);
+  gallery.request?.abort();
+  source.dispose();
+});

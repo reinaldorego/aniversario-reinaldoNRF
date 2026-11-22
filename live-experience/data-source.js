@@ -17,7 +17,7 @@ function imageUrl(value) {
   return url.href;
 }
 
-export function normalizeSnapshot(snapshot, { allowDemo = false } = {}) {
+export function normalizeSnapshot(snapshot, { allowDemo = false, requireImageUrls = true } = {}) {
   if (!snapshot || !["coming-soon", "open"].includes(snapshot.phase) || !Array.isArray(snapshot.photos)) {
     throw new Error("Resposta de galeria inválida.");
   }
@@ -38,8 +38,10 @@ export function normalizeSnapshot(snapshot, { allowDemo = false } = {}) {
     ids.add(photo.id);
     return {
       id: photo.id,
-      thumbnailUrl: imageUrl(photo.thumbnailUrl),
-      imageUrl: imageUrl(photo.imageUrl),
+      ...(requireImageUrls && {
+        thumbnailUrl: imageUrl(photo.thumbnailUrl),
+        imageUrl: imageUrl(photo.imageUrl)
+      }),
       width: photo.width,
       height: photo.height,
       alt: typeof photo.alt === "string" && photo.alt.trim() ? photo.alt : "Registro da festa",

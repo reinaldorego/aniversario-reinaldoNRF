@@ -1,4 +1,4 @@
-import { normalizeSnapshot } from "./data-source.js";
+import { normalizeSnapshot } from "./data-source.js?v=18";
 
 const BATCH_SIZE = 6;
 const REQUEST_TIMEOUT = 15000;
@@ -102,7 +102,10 @@ export class Gallery {
     this.setBusy(true);
     this.setState("loading");
     try {
-      const snapshot = normalizeSnapshot(await this.source.list({ signal: request.signal }), { allowDemo: this.demo });
+      const snapshot = normalizeSnapshot(await this.source.list({ signal: request.signal }), {
+        allowDemo: this.demo,
+        requireImageUrls: !this.source.getMedia
+      });
       if (id !== this.requestId) return;
       this.photos = snapshot.photos;
       this.visibleCount = Math.min(Math.max(BATCH_SIZE, this.visibleCount), this.photos.length);
@@ -194,7 +197,19 @@ export class Gallery {
     figure.append(button, caption);
     item.append(figure);
     this.elements.photoGrid.append(item);
-    image.src = photo.thumbnailUrl;
+    this.assignImage(image, photo, photo.thumbnailUrl, () => button.isConnected);
+  }
+
+  assignImage(image, photo, url, isCurrent) {
+    if (!this.source.getMedia) {
+      image.src = url;
+      return;
+    }
+    this.source.getMedia(photo).then(preview => {
+      if (isCurrent()) image.src = preview;
+    }).catch(() => {
+      if (isCurrent()) image.dispatchEvent(new Event("error"));
+    });
   }
 
   openViewer(index, opener) {
@@ -247,6 +262,6 @@ export class Gallery {
       e.viewerStage.setAttribute("aria-busy", "false");
     }, { once: true });
     e.viewerMedia.replaceChildren(image);
-    image.src = photo.imageUrl;
+    this.assignImage(image, photo, photo.imageUrl, isCurrent);
   }
 }

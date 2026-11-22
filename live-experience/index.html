@@ -9,7 +9,7 @@
   <title>LIVE EXPERIENCE — Reinaldo 18</title>
   <link rel="icon" href="../assets/icon-level-xviii.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../styles.css?v=17">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=18">
 </head>
 <body class="live-page">
   <main class="live-shell">
@@ -22,14 +22,29 @@
     </header>
 
 
-    <section id="gallery" class="gallery cloud-gallery" aria-label="Fotos da festa">
-      <p class="cloud-gallery-status" data-gallery-status role="status">Carregando a galeria…</p>
-      <div class="cloud-gallery-actions">
-        <a class="btn btn-outline" data-gallery-link target="_blank" rel="noopener noreferrer" hidden>ABRIR GALERIA EM OUTRA ABA</a>
-        <button class="btn btn-outline" data-gallery-retry type="button" hidden>TENTAR NOVAMENTE</button>
+    <section id="gallery" class="gallery" aria-labelledby="galleryTitle" aria-busy="false" data-state="loading">
+      <div class="gallery-heading">
+        <div>
+          <p class="live-kicker">OS REGISTROS DA NOITE</p>
+          <h2 id="galleryTitle">Em cada imagem,<br>uma lembrança.</h2>
+        </div>
+        <button id="refreshGallery" class="btn btn-outline gallery-refresh" type="button">ATUALIZAR GALERIA</button>
       </div>
-      <div class="cloud-gallery-frame" data-gallery-frame></div>
-      <noscript><p>Ative o JavaScript para abrir a galeria.</p></noscript>
+      <p id="gallerySummary" class="gallery-summary" role="status">Uma noite. Muitas lembranças.</p>
+      <div id="galleryState" class="live-notice" role="status" aria-live="polite" aria-atomic="true">
+        <span id="galleryBadge" class="live-status">CARREGANDO</span>
+        <h3 id="stateTitle">Buscando novos momentos…</h3>
+        <p id="stateDescription">Aguarde enquanto verificamos as imagens disponíveis.</p>
+      </div>
+      <div id="gallerySkeleton" class="gallery-skeleton" aria-hidden="true" hidden>
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <ul id="photoGrid" class="gallery-grid" aria-label="Imagens da galeria" hidden></ul>
+      <p id="galleryFeedback" class="gallery-feedback" role="status"></p>
+      <button id="loadMore" class="btn btn-outline gallery-more" type="button" hidden>VER MAIS IMAGENS</button>
+      <p id="gallerySync" class="gallery-sync" aria-live="polite"></p>
+      <a class="btn btn-outline gallery-direct" data-gallery-link rel="noopener noreferrer" target="_blank" hidden>ABRIR GALERIA EM OUTRA ABA</a>
+      <noscript><p class="gallery-feedback">Ative o JavaScript para atualizar a galeria e abrir as imagens.</p></noscript>
     </section>
 
     <footer class="live-footer">
@@ -41,6 +56,27 @@
       <p class="live-signature">THE NEXT CHAPTER</p>
     </footer>
   </main>
+
+  <dialog id="photoViewer" class="photo-viewer" aria-labelledby="viewerTitle" aria-describedby="viewerCaption">
+    <div class="viewer-top">
+      <p id="viewerTitle">Momentos ao vivo</p>
+      <button id="viewerClose" class="viewer-button viewer-close" type="button" aria-label="Fechar imagem" autofocus>×</button>
+    </div>
+    <div id="viewerStage" class="viewer-stage" aria-busy="false">
+      <div id="viewerMedia" class="viewer-media"></div>
+      <div id="viewerMessage" class="viewer-message">
+        <p id="viewerStatus" role="status">Carregando imagem…</p>
+        <button id="viewerRetry" class="viewer-button" type="button" hidden>TENTAR NOVAMENTE</button>
+      </div>
+    </div>
+    <p id="viewerCaption" class="viewer-caption"></p>
+    <div class="viewer-nav">
+      <button id="viewerPrevious" class="viewer-button" type="button" aria-label="Imagem anterior">← Anterior</button>
+      <span id="viewerPosition" aria-live="polite"></span>
+      <button id="viewerNext" class="viewer-button" type="button" aria-label="Próxima imagem">Próxima →</button>
+    </div>
+    <p class="viewer-help">Use ← e → para navegar. Esc para fechar.</p>
+  </dialog>
 
   <div class="invitation-music" role="group" aria-label="Trilha sonora do convite">
     <audio id="invitationAudio" preload="none" loop src="../assets/audio/horizon-diamond-tunes.mp3?v=b3299040c0dd8eca81babe0c3fb5400e720fd88eda24c4000eb8f1b8d1a3da2f"></audio>
@@ -56,6 +92,6 @@
   </div>
 
   <script src="../invitation-audio.js?v=17"></script>
-  <script type="module" src="app.js?v=17"></script>
+  <script type="module" src="app.js?v=18"></script>
 </body>
 </html>

@@ -4,6 +4,7 @@
 }
 
 .live-page [hidden] { display: none !important; }
+.gallery:not([data-state="error"]) .gallery-direct { display: none; }
 
 .live-shell {
   width: min(100%, 1180px);
