@@ -1,25 +1,20 @@
-/* LEVEL XVIII — Service Worker v12 (animações cinematográficas). Sem cache de tokens ou dados privados. */
+/* LEVEL XVIII — cache dos arquivos públicos do convite e da galeria. */
 
-const CACHE_NAME = "level-xviii-v12";
+const CACHE_NAME = "level-xviii-v14";
 const INVITATION_CACHE_PATTERN = /^level-xviii-v\d+$/;
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
   "./styles.css",
-  "./mobile-v8.css",
   "./app.js",
-  "./cinematic-motion.css",
-  "./cinematic-motion.js",
-  "./mobile-v8.js",
+  "./invitation-audio.js",
+  // O MP3 versionado é buscado somente após toque, fora do pré-cache.
   "./manifest.webmanifest",
   "./assets/reinaldo-oficial.jpeg",
   "./assets/icon-level-xviii.svg",
   "./assets/icon-level-xviii-192.png",
   "./assets/icon-level-xviii-512.png",
-  "./assets/icon-level-xviii-maskable-192.png",
-  "./assets/icon-level-xviii-maskable-512.png",
-  "./assets/icon-level-xviii-apple-180.png",
   "./live-experience/",
   "./live-experience/index.html",
   "./live-experience/styles.css",
@@ -55,10 +50,11 @@ self.addEventListener("activate", (event) => {
 
 async function fetchPage(request, url) {
   try {
-    // Prioriza a versao HTML atual. Nao salva resposta associada a tokens.
+    // Prioriza o HTML atual, inclusive quando há token na navegação.
     return await fetch(request);
   } catch (error) {
     const cache = await caches.open(CACHE_NAME);
+    // O fallback é somente HTML público; não armazena respostas por token.
     const cachedPage = await cache.match(`${url.origin}${url.pathname}`);
     if (cachedPage) return cachedPage;
     throw error;
@@ -68,7 +64,7 @@ async function fetchPage(request, url) {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  // APIs, outras origens e recursos nao incluidos no pacote vao direto a rede.
+  // APIs, fotos futuras e outros domínios seguem diretamente para a rede.
   if (
     event.request.method !== "GET" ||
     url.origin !== self.location.origin ||

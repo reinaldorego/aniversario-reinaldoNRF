@@ -116,7 +116,7 @@ if (returnedConfirmed || window.location.hash) {
   startBoot();
 }
 
-const eventDate = new Date("2026-11-28T20:00:00-03:00").getTime();
+const eventDate = new Date("2026-11-28T21:00:00-03:00").getTime();
 
 function updateCountdown() {
   let distance = eventDate - Date.now();
@@ -155,4 +155,38 @@ if ("serviceWorker" in navigator) {
       });
   });
 }
+
+// Mantém o deslocamento sutil da foto usado na prévia cinematográfica.
+(() => {
+  const hero = document.querySelector(".hero-visual");
+  if (!hero || !window.matchMedia || !window.requestAnimationFrame) return;
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let pending = false;
+
+  function updateParallax() {
+    pending = false;
+    if (reducedMotion.matches || document.hidden) {
+      hero.style.removeProperty("--hero-motion");
+      return;
+    }
+    const rect = hero.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+    const distance = Math.max(0, Math.min(-rect.top, rect.height));
+    hero.style.setProperty("--hero-motion", `${Math.min(distance * 0.12, 30).toFixed(2)}px`);
+  }
+
+  function scheduleParallax() {
+    if (pending) return;
+    pending = true;
+    window.requestAnimationFrame(updateParallax);
+  }
+
+  window.addEventListener("scroll", scheduleParallax, { passive: true });
+  window.addEventListener("resize", scheduleParallax, { passive: true });
+  document.addEventListener("visibilitychange", scheduleParallax);
+  if (reducedMotion.addEventListener) reducedMotion.addEventListener("change", scheduleParallax);
+  else reducedMotion.addListener?.(scheduleParallax);
+  enterBtn.addEventListener("click", scheduleParallax);
+  scheduleParallax();
+})();
 

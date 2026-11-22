@@ -34,7 +34,7 @@
 
   <link
     rel="apple-touch-icon"
-    href="assets/icon-level-xviii-apple-180.png"
+    href="assets/icon-level-xviii-192.png"
   >
 
   <link
@@ -57,13 +57,6 @@
     rel="stylesheet"
     href="styles.css"
   >
-
-  <link
-    rel="stylesheet"
-    href="mobile-v8.css"
-  >
-
-  <link rel="stylesheet" href="cinematic-motion.css">
 </head>
 
 <body>
@@ -133,17 +126,6 @@
          ABERTURA / FOTOGRAFIA OFICIAL
          ===================================== -->
 
-    <!-- Navegacao mobile: visivel na abertura, sem cortar a fotografia. -->
-    <a
-      id="mobileContinue"
-      class="mobile-continue"
-      href="#story"
-      aria-label="Continuar convite para a historia"
-    >
-      <span>CONTINUAR CONVITE</span>
-      <span class="mobile-continue-arrow" aria-hidden="true">↓</span>
-    </a>
-
     <section class="hero" aria-labelledby="heroTitle">
 
       <div class="hero-visual">
@@ -169,13 +151,13 @@
         <p class="hero-tagline">18 anos. Infinitas possibilidades.</p>
 
         <div class="hero-details">
-          <time datetime="2026-11-28T20:00:00-03:00">
+          <time datetime="2026-11-28T21:00:00-03:00">
             <span>SÁBADO</span>
             <strong>28 NOV 2026</strong>
           </time>
           <div>
             <span>HORÁRIO DE BELÉM</span>
-            <strong>20h</strong>
+            <strong>21h</strong>
           </div>
         </div>
 
@@ -188,6 +170,19 @@
         <a class="hero-next" href="#story">
           CONTINUAR CONVITE <span aria-hidden="true">↓</span>
         </a>
+
+        <div class="invitation-music" role="group" aria-label="Trilha sonora do convite">
+          <audio id="invitationAudio" preload="none" src="assets/audio/horizon-diamond-tunes.mp3?v=b3299040c0dd8eca81babe0c3fb5400e720fd88eda24c4000eb8f1b8d1a3da2f"></audio>
+          <button id="musicToggle" class="music-toggle hidden" type="button" aria-controls="invitationAudio">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+              <path d="M3 9v6h4l5 4V5L7 9H3z" fill="currentColor"></path>
+              <path id="musicOnIcon" d="M15 9a4 4 0 0 1 0 6M17.5 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
+              <path id="musicOffIcon" class="hidden" d="M16 9l5 6m0-6l-5 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
+            </svg>
+            <span id="musicLabel" class="music-label">Reproduzir música</span>
+          </button>
+          <p id="musicStatus" class="music-status" role="status" aria-live="polite"></p>
+        </div>
       </div>
 
     </section>
@@ -280,7 +275,7 @@
           </span>
 
           <strong>
-            20:00
+            21:00
           </strong>
 
           <small>
@@ -521,7 +516,7 @@
     >
 
       <div class="monogram">
-        RNRF
+        NR
       </div>
 
       <h2>
@@ -542,8 +537,7 @@
 
 
   <script src="app.js"></script>
-  <script src="mobile-v8.js"></script>
-  <script src="cinematic-motion.js" defer></script>
+  <script src="invitation-audio.js"></script>
 
 </body>
 
